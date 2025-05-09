@@ -1,0 +1,55 @@
+
+### SQL Query Practice Questions (Intermediate to Very Difficult)
+
+#### Intermediate Queries
+1. Retrieve a list of all students (Student) along with their full name, school, and major.
+2. Retrieve a list of all teachers (Teacher) along with their years of experience and faculty.
+3. Find all video lectures (VideoLecture) created within a specified time range (start_time, end_time).
+4. Find a list of questions (Question) with a certain difficulty level and containing a specific keyword in their content.
+5. Count the number of questions in each quiz (Quiz) based on `total_question`.
+6. Retrieve a list of documents (Document) created by a specific teacher.
+7. Find information about quizzes (Quiz) in which students scored the highest.
+8. Find all subjects (Subject) taught by teachers through the documents or video lectures they created.
+9. Retrieve detailed information about student answers (Examine) in a specific quiz, including correctness and individual question scores.
+
+#### Difficult Queries
+10. Find students who achieved the highest score in each subject (Subject) and their score.
+11. Count the number of questions (Question) at each difficulty level in the entire system.
+12. Find students who participated in a quiz but did not meet the minimum passing score (based on `score`).
+13. Retrieve a list of all questions in a specific quiz along with their answer options (Option) for each question.
+14. Find all students who participated in a quiz the most frequently in the system and their number of attempts.
+15. Identify teachers who have created the most documents and videos for subjects with at least one student scoring above the specified average.
+
+#### Very Difficult Queries
+16. Identify teachers with the most years of experience in a specific faculty and the subjects they teach.
+17. Identify students with birthdays in the current month who have never participated in any quiz.
+18. Find quizzes with the highest difficulty (most difficult questions) and the shortest completion time.
+19. Find all students who achieved perfect scores in a subject and the specific quizzes for that subject.
+20. Find all students with the highest average score in the entire system and the quizzes they participated in.
+
+#### Advanced Complex Queries
+21. Identify students who took the shortest time to complete a quiz while achieving the maximum score in each subject.
+22. Retrieve students with the highest average score across all subjects they have participated in and list these subjects.
+23. Retrieve a list of students who scored perfectly on all questions in a quiz but still did not achieve the maximum total score due to question weighting.
+24. Identify teachers who created the most documents and video lectures for each subject, ordered by quantity in descending order.
+25. Find all quizzes in which at least one student achieved a perfect score, and list these students along with the number of correct answers they provided.
+26. Identify students who improved their scores on each retake of a quiz in the same subject, along with their average score increase.
+27. Retrieve a list of students who participated in all quizzes of a subject and scored the highest among other students in each quiz of that subject.
+28. Identify subjects taught exclusively by a single teacher (based on documents and videos) and list the teacher's name.
+29. Retrieve a list of teachers whose students have accessed all documents, videos, and quizzes created by the teacher for a specific subject.
+30. Identify students with an average score above the system-wide average across at least 3 quizzes in different subjects.
+
+#### Expert-Level Queries
+31. Find questions with at least 3 answer options but only one correct option, and which have been answered correctly by at least one student in a quiz.
+32. Identify students who tend to select incorrect options frequently in quizzes of a specific subject (incorrect answers > 50% of total answers).
+33. Calculate the average correct-answer rate of students for questions of different difficulty levels (e.g., easy, medium, hard) across all quizzes.
+34. Find students who scored the highest in the most difficult quiz (based on average question difficulty), but whose total score was not the highest.
+35. Retrieve a list of all students whose scores consistently increase in each quiz within the same subject, meaning their score in each subsequent attempt is equal to or higher than the previous one.
+
+#### Highly Complex Queries
+36. Identify teachers with documents or videos most frequently used in quizzes (based on student views before the quiz).
+37. Find questions that the majority of students answered correctly but are in the quiz with the lowest average score.
+38. Identify students whose total score in all quizzes of a subject exceeds the total score of all quizzes by other students in the same subject.
+39. Identify students who answered all questions of a certain difficulty level correctly in a specific quiz but have never achieved a perfect score.
+40. Identify students who have fewer incorrect answers across multiple quizzes in a subject, showing improvement over time.
+
