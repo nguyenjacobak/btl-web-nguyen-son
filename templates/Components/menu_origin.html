@@ -1,0 +1,367 @@
+{% load static %}
+
+<!-- CSS cho menu -->
+<style>
+    /* Menu hamburger và nav overlay */
+    .menu-toggle {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 15px;
+        box-shadow: 0 3px 15px rgba(173, 216, 230, 0.5);
+        z-index: 100;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .menu-toggle:hover {
+        background: rgba(255, 255, 255, 0.95);
+        transform: scale(1.05);
+        box-shadow: 0 5px 20px rgba(173, 216, 230, 0.7);
+    }
+
+    .menu-toggle span {
+        position: relative;
+        width: 25px;
+        height: 3px;
+        background: #3a7bd5;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+    }
+
+    .menu-toggle span::before,
+    .menu-toggle span::after {
+        content: '';
+        position: absolute;
+        width: 25px;
+        height: 3px;
+        background: #3a7bd5;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+    }
+
+    .menu-toggle span::before {
+        transform: translateY(-8px);
+    }
+
+    .menu-toggle span::after {
+        transform: translateY(8px);
+    }
+
+    .menu-toggle.active span {
+        background: transparent;
+    }
+
+    .menu-toggle.active span::before {
+        transform: translateY(0px) rotate(45deg);
+    }
+
+    .menu-toggle.active span::after {
+        transform: translateY(0px) rotate(-45deg);
+    }
+
+    .nav-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 0;
+        background: rgba(173, 216, 230, 0.7); /* Màu xanh lợt pha trắng sương */
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        z-index: 99;
+        overflow: hidden;
+        opacity: 0;
+        /* Thiết lập shape */
+        border-radius: 0 0 80% 0;
+        clip-path: polygon(0 0, 100% 0, 70% 100%, 0% 100%);
+        box-shadow: 
+            0 10px 30px rgba(173, 216, 230, 0.3),
+            0 5px 15px rgba(255, 255, 255, 0.4);
+    }
+
+    .nav-overlay.active {
+        width: 320px;
+        height: 100%;
+        opacity: 1;
+    }
+
+    .nav-overlay::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(173, 216, 230, 0.1) 100%);
+        border-radius: 0 0 80% 0;
+        z-index: -1;
+    }
+
+    .nav-overlay::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        right: -20px;
+        width: 100px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        filter: blur(20px);
+        z-index: -1;
+        transform: rotate(15deg);
+    }
+
+    .nav-content {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        padding-top: 90px;
+        padding-left: 35px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.4s ease;
+    }
+
+    .nav-overlay.active .nav-content {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Thêm heading cho menu */
+    .nav-heading {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 25px;
+        position: relative;
+        padding-bottom: 10px;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: all 0.5s ease 0.1s;
+    }
+
+    .nav-heading:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: linear-gradient(90deg, #2c3e50, transparent);
+        border-radius: 3px;
+    }
+
+    .nav-overlay.active .nav-heading {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .nav-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        text-align: left;
+        width: 90%;
+    }
+
+    .nav-menu li {
+        margin: 15px 0;
+        opacity: 0;
+        transform: translateX(-20px);
+        transition: all 0.3s ease;
+    }
+
+    .nav-overlay.active .nav-menu li {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .nav-overlay.active .nav-menu li:nth-child(1) { transition-delay: 0.15s; }
+    .nav-overlay.active .nav-menu li:nth-child(2) { transition-delay: 0.25s; }
+    .nav-overlay.active .nav-menu li:nth-child(3) { transition-delay: 0.35s; }
+    .nav-overlay.active .nav-menu li:nth-child(4) { transition-delay: 0.45s; }
+    .nav-overlay.active .nav-menu li:nth-child(5) { transition-delay: 0.55s; }
+    .nav-overlay.active .nav-menu li:nth-child(6) { transition-delay: 0.65s; }
+
+    .nav-menu li a {
+        color: #2c3e50; /* Màu text sẫm hơn để nổi bật trên nền sáng */
+        font-size: 1.2rem;
+        font-weight: 600;
+        text-decoration: none;
+        padding: 8px 5px 8px 15px;
+        display: block;
+        transition: all 0.3s ease;
+        position: relative;
+        border-radius: 8px;
+    }
+
+    .nav-menu li a:hover {
+        color: #3a7bd5;
+        background-color: rgba(255, 255, 255, 0.3);
+        transform: translateX(3px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-menu li a::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 0;
+        background: #3a7bd5;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+    }
+
+    .nav-menu li a:hover::before {
+        height: 70%;
+    }
+
+    .logout-btn {
+        color: #3a7bd5 !important;
+        border: 2px solid rgba(58, 123, 213, 0.5) !important;
+        border-radius: 30px;
+        padding: 8px 20px !important;
+        margin-top: 20px;
+        display: inline-block !important;
+        width: auto !important;
+        text-align: center;
+        background-color: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .logout-btn:hover {
+        background-color: #3a7bd5 !important;
+        color: white !important;
+        transform: translateX(0px) !important;
+        box-shadow: 0 5px 15px rgba(58, 123, 213, 0.4);
+    }
+    
+    .logout-btn::before {
+        display: none;
+    }
+
+    .user-profile {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        align-items: center;
+        z-index: 10;
+    }
+
+    .user-profile img {
+        width: 45px;
+        height: 45px;
+        border: 2px solid white;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .user-profile img:hover {
+        transform: scale(1.1);
+        border-color: #ffcc00;
+    }
+
+    /* Responsive styles */
+    @media (max-width: 768px) {
+        .nav-menu li a {
+            font-size: 1.3rem;
+        }
+    }
+</style>
+
+<!-- Menu Toggle Button -->
+<div class="menu-toggle">
+    <span></span>
+</div>
+
+<!-- Navigation Overlay -->
+<div class="nav-overlay">
+    <div class="nav-content">
+        <h2 class="nav-heading">Danh mục</h2>
+        <ul class="nav-menu">
+            <li><a href="{% url 'welcome' %}"><i class='bx bxs-home'></i> Trang chủ</a></li>
+            <li><a href="{% url 'my_classes' %}"><i class='bx bxs-graduation'></i> Lớp học</a></li>
+            <li><a href="{% url 'profile' request.user.username %}"><i class='bx bxs-user-circle'></i> Hồ sơ</a></li>
+            {% if request.user.is_superuser %}
+            <li><a href="{% url 'account_management' %}"><i class='bx bxs-user-account'></i> Quản lý tài khoản</a></li>
+            {% endif %}
+            <li><a href="{% url 'forum-list' %}"><i class='bx bxs-chat'></i> Diễn đàn</a></li>
+            <li><a href="{% url 'logout' %}" class="logout-btn"><i class='bx bx-log-out'></i> Đăng xuất</a></li>
+        </ul>
+    </div>
+</div>
+
+<!-- User Profile Icon -->
+<!-- <div class="user-profile">
+    {% if request.user.is_authenticated %}
+    <a href="{% url 'profile' request.user.username %}">
+        <img src="{{request.user.profile.profile_img.url}}" alt="profile_img">
+    </a>
+    {% endif %}
+</div> -->
+
+<!-- JavaScript for the menu -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navOverlay = document.querySelector('.nav-overlay');
+        
+        if (menuToggle && navOverlay) {
+            menuToggle.addEventListener('click', function(e) {
+                e.preventDefault(); // Ngăn hành vi mặc định
+                e.stopPropagation(); // Ngăn sự kiện lan ra ngoài
+                
+                this.classList.toggle('active');
+                navOverlay.classList.toggle('active');
+                
+                // Prevent scrolling when menu is open
+                if (navOverlay.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = 'auto';
+                }
+            });
+            
+            // Close menu when clicking on a menu item
+            const menuLinks = document.querySelectorAll('.nav-menu a');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    menuToggle.classList.remove('active');
+                    navOverlay.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target)) {
+                    menuToggle.classList.remove('active');
+                    navOverlay.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+            
+            // Ngăn sự kiện click bên trong nav-overlay lan ra ngoài
+            navOverlay.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+    });
+</script>

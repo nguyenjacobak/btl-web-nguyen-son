@@ -1,0 +1,15 @@
+Django==5.1.3
+django_environ==0.11.2
+environ==1.0
+fuzzywuzzy==0.18.0
+openpyxl==3.1.5
+pandas==2.2.3
+Unidecode==1.3.8
+matplotlib==3.9.2
+seaborn==0.13.2
+requests==2.31.0
+# New dependencies for Azure AI Inference
+azure-ai-inference==1.0.0
+azure-core==1.29.5
+openai==1.5.0  # Keep for backward compatibility during migration
+python-dotenv==1.0.0

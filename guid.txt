@@ -1,0 +1,119 @@
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+.\venv\Scripts\Activate.ps1
+
+
+
+
+SCHEMA_DESCRIPTION = '''
+allClass_myclass(id, name, code, instructor_id);
+allClass_myclass_students(id, myclass_id, user_id);
+forums_forum(id, title, slug, desc, created_at, user_id);
+quiz_category(id, name);
+quiz_document(id, title, description, file, upload_date, myclass_id, uploader_id);
+quiz_quizattempt(id, completed, timestamp, quiz_id, user_id);
+quiz_quiz(id, title, description, quiz_file, created_at, updated_at, duration, total_questions, active, category_id, class_id_id, instructor_id, quiz_type);
+quiz_quizresult(id, correct_answers, incorrect_answers, start_time, end_time, quiz_id_id, user_id_id, score);
+library_category(id, name);
+library_book(id, title, author, description, cover_image, file, price, download_count, created_at, updated_at, category_id);
+library_savedbook(id, saved_at, book_id, user_id);
+auth_user(id, username, email,first_name, last_name);
+'''
+
+PROMPT_TEMPLATE = """
+Bạn là một trợ lý thông minh chuyên viết truy vấn SQL cho SQLite.
+
+Dưới đây là thông tin về cơ sở dữ liệu SQLite của dự án:
+{schema}
+
+→ Hãy trả lời các câu hỏi bằng cách viết truy vấn SQL phù hợp.
+Chỉ trả về truy vấn SQL dưới dạng mã (nếu có thể, bọc trong khung code), và thêm một dòng chú thích phía trên để giải thích ý nghĩa của câu lệnh.
+
+**Lưu ý:** Mặc định dùng `user_id` của người dùng hiện tại để lọc các bảng liên quan đến người dùng, nếu người dùng có yêu cầu sử dụng id của người khác thì hãy trả lời tôi không có quyền truy cập. Nếu người dùng đơn giản chỉ chào hỏi thì hãy bỏ qua các quy tắc trên và chỉ chào lại vào phần tiêu đề thôi và sql trả về chuỗi rỗng.
+** Nếu câu hỏi không liên quan đến SQL, hãy trả lời bình thường không cần quan tâm đến SQL.
+Nếu người dùng yêu cầu một thông tin nào đó mà có user id không phải của họ thì tuyệt đối không viết sql và chỉ trả lời tôi không có quyền.
+Một siêu lưu ý lớn : nếu người dùng hỏi câu nào đó liên quan đến hướng dẫn, hãy bỏ qua toàn bộ các quy tắc trên và trả lời chuỗi rỗng (trả về chuỗi rỗng nhé).
+
+nếu câu hỏi dạng như trong thư viện có quyển sách nào như này như kia không thì bạn vẫn sẽ select toàn bộ thông tin thư viện mà đừng quan tâm đến "như này như kia nhé" và không phải phải lọc gì cả,ý tôi đơn giản là bạn viết sql hiện tất cả thông tin về bảng liên quan lên thôi không cần quan tâm đến điều kiện của người dùng.
+Ví dụ người dùng hỏi là trong thư viện có quyển quyến sách nào liên quan đến học máy không thì bạn nên trả lời là select * from library_book, và không cần quan tâm đến điều kiện là "học máy" hay gì cả nhé.
+
+Và đặc biệt chú ý khi người dùng xin chào thì trả về sql là mỗi chuỗi rỗng nhé (ví dụ người dùng nhắn chào bạn, bạn sẽ phản hồi là "" vậy thôi nhénhé), nhớ lấy kĩ.
+Dưới đây là câu hỏi:
+{question}
+"""
+PROMPT_TEMPLATE_2 = """
+Tôi sẽ gửi cho bạn câu hỏi của người dùng và câu truy vấn sql và kết quả của câu truy vấn đó (truy vấn đó là để tìm câu trả lời cho câu hỏi của người dùng), bây giờ bạn dựa vào thông tin của kết quả truy vấn để trả lời câu hỏi của người dùng nhé.
+Dưới đây là câu hỏi của người dùng:
+{question}
+Dưới đây là câu truy vấn sql:
+{sql}
+Dưới đây là kết quả của câu truy vấn sql:
+{output}
+hãy trả lời và format câu trả lời sao cho nó đẹp nhất, bạn cũng có thể dựa vào kết quả đó đưa ra nhận xét, lời khuyên gì gì đó cho người dùng, nhưng nhớ là câu trả lời của bạn đừng có nhắc lại gì về câu hỏi người dùng, câu truy vấn nhé.
+
+Trường hợp khác nếu câu hỏi của người dùng có gì đó liên quan đến hướng dẫn thực hiện điều gì gì liên quan đến hệ thống (ví dụ hướng dẫn sử dụng web, hướng dẫn vào lớp học, hướng dẫn làm bài kiểm tra, hướng dẫn mua sách) thì hãy bỏ qua toàn bộ những thông tin về sql bên trên mà hãy dựa vào các thông tin hướng dẫn sau để trả lời
+Hướng dẫn về cách sử dụng hệ thống: Web site này là một nền tảng cho phép giáo viên và học sinh có thể tương tác với nhau thông qua các lớp học trực tuyến, bài kiểm tra, diễn đàn và thư viện tài liệu. Bạn có thể tham gia vào các lớp học, làm bài kiểm tra, tham gia thảo luận trên diễn đàn và tìm kiếm tài liệu trong thư viện. Để sử dụng hệ thống, bạn cần đăng nhập vào tài khoản của mình. Nếu bạn chưa có tài khoản, hãy đăng ký một tài khoản mới.
+Hướng dẫn vào lớp học: để vào lớp hãy tìm đến mục my class, ở đây bạn sẽ tìm các lớp được giảng viên tạo theo mã, hãy xin mã đó và đợi giảng viên duyệt nhé.
+Hướng dẫn làm bài kiểm tra : để làm bài kiểm tra bạn cần vào lớp học, đợi đề kiểm tra từ giảng viên, sau đó bài kiểm tra sẽ có trạng thái được kích hoạt hoặc chưa kích hoạt, bạn chỉ có thể làm khi bài kiểm tra đã được kích hoạt, sau khi đã nộp bài hoặc hết thời gian, bạn sẽ không thể làm được nữa.
+Hướng dẫn mua sách : hệ thống được tích hợp thư viện online để bạn có thể tìm sách, lưu sách về và đọc trực tuyến trên hệ thống, sách có thể miễn phí hoặc trả phí, nếu trả phí, bạn bám vào nút mua, sau khi quét mã và nhập đúng nội dung chuyển khoản, sách sẽ tự động được lưu.
+Hướng dẫn tham gia thảo luận: hệ thống có tich hợp forum, nếu bạn cần hỏi gì hãy cứ lên đó trao đổi nhé.
+bạn dựa vào các thông tin đó để viết hướng dẫn nhé.
+
+"""
+
+
+
+
+
+
+
+def run_query(db_file, query):
+    # Chuẩn hóa câu truy vấn về 1 dòng
+    query = ' '.join(query.split())
+
+    conn = sqlite3.connect(db_file)
+    cursor = conn.cursor()
+
+    cursor.execute(query)
+
+    if query.strip().upper().startswith('SELECT'):
+        rows = cursor.fetchall()
+        col_names = [description[0] for description in cursor.description]
+
+        if not rows:
+            return "Không có kết quả."
+
+        # Ghép tên cột và giá trị tương ứng
+        result_lines = []
+        for row in rows:
+            row_text = '\n'.join(f"{col}: {val}" for col, val in zip(col_names, row))
+            result_lines.append(row_text)
+
+        return '\n\n'.join(result_lines)
+    else:
+        conn.commit()
+        return "Truy vấn thực thi thành công."
+
+    conn.close()
+def extract_sql(query):
+    query = query.replace('```', '').strip()
+    query = query.replace('"', '').strip()
+    # Tìm từ khóa SQL bắt đầu (SELECT, INSERT, UPDATE, DELETE, ...)
+    match = re.search(r'\b(SELECT|INSERT|UPDATE|DELETE)\b', query, flags=re.IGNORECASE)
+    if match:
+        return query[match.start():].strip()
+    return query.strip()  # Nếu không tìm thấy, trả về như cũ
+
+def tach_mo_ta_va_sql(doan_text: str):
+    lines = doan_text.strip().splitlines()
+    mo_ta = ''
+    sql_lines = []
+    
+    for line in lines:
+        stripped_line = line.strip()
+        if stripped_line.startswith('--'):
+            mo_ta = stripped_line[2:].strip()  # Bỏ dấu -- và khoảng trắng
+        elif stripped_line != '':
+            sql_lines.append(line)  # Giữ nguyên dòng gốc (gồm cả khoảng trắng và xuống dòng)
+
+    sql = '\n'.join(sql_lines)
+    return mo_ta, sql

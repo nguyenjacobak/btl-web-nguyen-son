@@ -1,0 +1,443 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{object.title}} | Diễn đàn</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-image: url('/static/images/Ptit.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* Lớp overlay làm tối ảnh nền */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 20, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Simple transition for page */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Container with glassmorphism effect */
+        .container {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 30px;
+            margin-top: 80px;
+            margin-bottom: 50px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        /* Jumbotron styling - keep it as in the original but enhance it */
+        .jumbotron {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            position: relative;
+        }
+        
+        /* Title styling */
+        .display-4 {
+            color: #2a6ac5;
+            font-weight: 700;
+            margin-bottom: 15px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .display-4::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #3a7bd5, transparent);
+            border-radius: 3px;
+        }
+        
+        /* Content styling */
+        .lead {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        /* Buttons styling */
+        .btn {
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+        
+        /* Cải tiến nút Edit và Delete */
+        .forum-actions .btn {
+            font-size: 0.8rem;
+            padding: 5px 12px;
+            opacity: 0.9;
+            position: relative;
+            top: -5px;
+            float: right;
+            margin-left: 5px;
+        }
+        
+        .forum-actions {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3a7bd5, #2a6ac5);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2a6ac5, #1a5ab5);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(58, 123, 213, 0.3);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f0ad4e, #ec971f);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #ec971f, #d58512);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #d9534f, #c9302c);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #c9302c, #b92c28);
+            color: white;
+        }
+        
+        /* Comments section */
+        .comments-section {
+            background: rgba(250, 250, 250, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        h3 {
+            color: #3a7bd5;
+            font-weight: 600;
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+        
+        h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, #3a7bd5, transparent);
+            border-radius: 2px;
+        }
+        
+        /* Form styling */
+        .form-control {
+            border-radius: 15px;
+            padding: 15px;
+            resize: none;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #3a7bd5;
+            box-shadow: 0 0 0 0.25rem rgba(58, 123, 213, 0.25);
+        }
+        
+        /* Links styling */
+        a {
+            color: #3a7bd5;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        a:hover {
+            color: #1a5ab5;
+            text-decoration: underline;
+        }
+        
+        /* Meta info styling */
+        .text-muted {
+            color: #6c757d;
+        }
+        
+        hr {
+            border-color: rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+        }
+        
+        /* User profile in menu */
+        .user-profile {
+            display: none;
+        }
+        
+        /* CSS cho comment */
+        .comment-wrapper {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .comment-actions {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            display: flex;
+        }
+        
+        .comment-actions .btn {
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            margin-left: 5px;
+        }
+        
+        .comment-content {
+            margin-bottom: 10px;
+            margin-right: 80px; /* Để không bị đè lên bởi nút */
+        }
+        
+        .comment-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+        
+        .btn-reply {
+            padding: 3px 10px;
+            font-size: 0.75rem;
+            background: transparent;
+            border: 1px solid #ced4da;
+            color: #6c757d;
+        }
+        
+        .btn-reply:hover {
+            background-color: #f8f9fa;
+            color: #3a7bd5;
+            border-color: #3a7bd5;
+        }
+        
+        .reply-form {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: rgba(248, 249, 250, 0.7);
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .replies {
+            margin-left: 30px;
+            margin-top: 15px;
+            border-left: 2px solid rgba(58, 123, 213, 0.3);
+            padding-left: 15px;
+        }
+    </style>
+</head>
+
+<body class="fade-in">
+    <!-- Include the newmenu component -->
+    {% include "Components/newmenu.html" %}
+    
+    <div class="container my-5">
+        <div class="jumbotron p-4">
+            <h1 class="display-4">{{object.title}}</h1>
+            
+            {% if request.user == object.user %}
+            <div class="forum-actions">
+                <a href="{% url 'forum-edit' object.id %}" class="btn btn-warning">
+                    <i class="fas fa-edit me-1"></i>Edit
+                </a>
+                <form method="post" action="{% url 'forum-delete' object.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="submit" value="Delete" class="btn btn-danger">
+                </form>
+            </div>
+            {% endif %}
+            
+            <p class="lead">{{ object.desc }}</p>
+            <p class="text-muted">- <i>{{object.created_at | naturaltime}}</i></p>
+            <p class="text-muted">by <a href="{% url 'forum-by' object.user %}">{{ object.user }}</a></p>
+            <hr>
+            <h3><i class="far fa-comment-alt me-2"></i>Bình luận</h3>
+            <div class="comments-section mb-4" id="comments-container">
+                {% for comment in parent_comments %}
+                    <div class="comment-wrapper" id="comment-{{ comment.id }}">
+                        {% if request.user == comment.user %}
+                        <div class="comment-actions">
+                            <a href="{% url 'edit-comment' comment.id %}" class="btn btn-warning">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="post" action="{% url 'delete-comment' comment.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="comment-content">
+                            {{ comment.desc|linebreaks }}
+                        </div>
+                        
+                        <div class="comment-meta">
+                            <div>
+                                <span class="text-muted">By <a href="{% url 'forum-by' comment.user %}">{{ comment.user }}</a> - <i>{{comment.created_at | naturaltime}}</i></span>
+                            </div>
+                            <button class="btn btn-reply" onclick="toggleReplyForm('{{ comment.id }}')">
+                                <i class="fas fa-reply me-1"></i>Reply
+                            </button>
+                        </div>
+                        
+                        <!-- Reply form -->
+                        <div class="reply-form" id="reply-form-{{ comment.id }}">
+                            <form method="post" action="{% url 'add-comment' forum.id %}">
+                                {% csrf_token %}
+                                <textarea name="desc" class="form-control mb-2" rows="2" placeholder="Enter your reply" required></textarea>
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-sm btn-secondary me-2" onclick="toggleReplyForm('{{ comment.id }}')">Cancel</button>
+                                    <button type="submit" class="btn btn-sm btn-primary">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Replies -->
+                        {% if comment.get_children %}
+                            <div class="replies">
+                                {% for reply in comment.get_children %}
+                                    <div class="comment-wrapper" id="comment-{{ reply.id }}">
+                                        {% if request.user == reply.user %}
+                                        <div class="comment-actions">
+                                            <a href="{% url 'edit-comment' reply.id %}" class="btn btn-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="post" action="{% url 'delete-comment' reply.id %}" style="display:inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <div class="comment-content">
+                                            {{ reply.desc|linebreaks }}
+                                        </div>
+                                        
+                                        <div class="comment-meta">
+                                            <div>
+                                                <span class="text-muted">By <a href="{% url 'forum-by' reply.user %}">{{ reply.user }}</a> - <i>{{reply.created_at | naturaltime}}</i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                
+                {% if not parent_comments %}
+                    <p class="text-muted fst-italic">Chưa có bình luận nào.</p>
+                {% endif %}
+            </div>
+            
+            <form method="post" action="{% url 'add-comment' forum.id %}">
+                {% csrf_token %}
+                <textarea name="desc" class="form-control mb-2" rows="3" placeholder="Enter your comment" required=True></textarea>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane me-2"></i>Submit
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {% include "Components/chat_bubble.html" %}
+    <script src="/static/cssQuan/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Hàm hiển thị/ẩn form trả lời
+        function toggleReplyForm(commentId) {
+            var replyForm = document.getElementById('reply-form-' + commentId);
+            if (replyForm.style.display === 'block') {
+                replyForm.style.display = 'none';
+            } else {
+                replyForm.style.display = 'block';
+                replyForm.querySelector('textarea').focus();
+            }
+        }
+    </script>
+</body>
+</html>

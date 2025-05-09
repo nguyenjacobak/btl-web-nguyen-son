@@ -1,0 +1,189 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm sách mới - Thư viện PTIT</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="{% static 'css/library.css' %}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+</head>
+
+<body>
+    {% include 'Components/newmenu.html' %}
+
+    <!-- Hiệu ứng đám mây trang trí -->
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="cloud cloud-4"></div>
+    
+    <div class="container glass-container mt-5 pt-4">
+        {% if messages %}
+            <div class="messages-container mb-4">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="m-0">Thêm sách mới</h2>
+            <a href="{% url 'library_home' %}" class="glass-btn">
+                <i class="fas fa-arrow-left"></i> Quay lại thư viện
+            </a>
+        </div>
+        
+        <div class="glass-card mb-4">
+            <div class="card-header glass-header">
+                <h4 class="mb-0">Thông tin sách</h4>
+            </div>
+            <div class="card-body">
+                <form action="{% url 'add_book' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Tên sách <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control glass-input" id="title" name="title" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="author" class="form-label">Tác giả <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control glass-input" id="author" name="author" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="category" class="form-label">Danh mục <span class="text-danger">*</span></label>
+                                <select class="form-select glass-input" id="category" name="category" required>
+                                    <option value="">Chọn danh mục</option>
+                                    <!-- Danh mục cố định thay vì tải động từ database -->
+                                    <option value="1">Công nghệ thông tin</option>
+                                    <option value="2">Kỹ thuật phần mềm</option>
+                                    <option value="3">Mạng máy tính</option>
+                                    <option value="4">An toàn thông tin</option>
+                                    <option value="5">Trí tuệ nhân tạo</option>
+                                    <option value="6">Học máy</option>
+                                    <option value="7">Khoa học dữ liệu</option>
+                                    <option value="8">Điện tử viễn thông</option>
+                                    <option value="9">Kinh tế số</option>
+                                    <option value="10">Marketing số</option>
+                                    <option value="11">Toán học</option>
+                                    <option value="12">Vật lý</option>
+                                    <option value="13">Tiếng Anh chuyên ngành</option>
+                                    <option value="14">Quản trị kinh doanh</option>
+                                    <option value="15">Kỹ năng mềm</option>
+                                    <option value="16">Lập trình di động</option>
+                                    <option value="17">Thiết kế web</option>
+                                    <option value="18">IoT - Internet vạn vật</option>
+                                    <option value="19">Blockchain</option>
+                                    <option value="20">Điện toán đám mây</option>
+                                    <option value="21">Sách kĩ năng phát triển</option>
+                                    <option value="22">Tiểu thuyết kinh điển</option>
+
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="price" class="form-label">Giá (VNĐ)</label>
+                                <input type="number" class="form-control glass-input" id="price" name="price" value="0" min="0">
+                                <div class="form-text">Nhập 0 cho sách miễn phí</div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="cover_image" class="form-label">Ảnh bìa sách</label>
+                                <input type="file" class="form-control glass-input" id="cover_image" name="cover_image" accept="image/*">
+                                <div class="form-text">Định dạng JPG, PNG, GIF (tối đa 2MB)</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="file" class="form-label">File sách <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control glass-input" id="file" name="file" accept=".pdf,.epub,.mobi" required>
+                                <div class="form-text">Định dạng PDF, EPUB, MOBI</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Mô tả sách</label>
+                                <textarea class="form-control glass-input" id="description" name="description" rows="5"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-container my-4" style="display: none;">
+                        <h5>Xem trước ảnh bìa</h5>
+                        <div class="cover-preview-box">
+                            <img id="cover-preview" src="#" alt="Cover Preview">
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2 justify-content-end mt-4">
+                        <button type="reset" class="glass-btn">
+                            <i class="fas fa-redo"></i> Làm mới
+                        </button>
+                        <button type="submit" class="glass-btn-success">
+                            <i class="fas fa-save"></i> Thêm sách
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/library.js' %}"></script>
+    <script>
+        // Xử lý xem trước ảnh bìa
+        document.addEventListener('DOMContentLoaded', function() {
+            const coverInput = document.getElementById('cover_image');
+            const previewContainer = document.querySelector('.preview-container');
+            const coverPreview = document.getElementById('cover-preview');
+            
+            if (coverInput && coverPreview) {
+                coverInput.addEventListener('change', function() {
+                    if (this.files && this.files[0]) {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            coverPreview.src = e.target.result;
+                            previewContainer.style.display = 'block';
+                        }
+                        
+                        reader.readAsDataURL(this.files[0]);
+                    } else {
+                        previewContainer.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Thêm style cho hộp xem trước
+            const previewBox = document.querySelector('.cover-preview-box');
+            if (previewBox) {
+                previewBox.style.width = '150px';
+                previewBox.style.height = '200px';
+                previewBox.style.border = '1px solid rgba(255, 255, 255, 0.3)';
+                previewBox.style.borderRadius = '10px';
+                previewBox.style.overflow = 'hidden';
+                previewBox.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
+                previewBox.style.marginTop = '10px';
+            }
+            
+            if (coverPreview) {
+                coverPreview.style.width = '100%';
+                coverPreview.style.height = '100%';
+                coverPreview.style.objectFit = 'cover';
+            }
+        });
+    </script>
+</body>
+</html>

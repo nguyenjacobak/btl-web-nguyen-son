@@ -1,0 +1,397 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diễn đàn PTIT</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-image: url('/static/images/Ptit.jpg'); /* Thay đổi thành nền giống home */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* Lớp overlay làm tối ảnh nền */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 20, 0.7); /* Lớp lọc màu tối đậm hơn */
+            backdrop-filter: blur(5px); /* Tăng độ mờ nền */
+            -webkit-backdrop-filter: blur(5px);
+            z-index: -1;
+        }
+
+        /* Clouds for background */
+        .cloud {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1);
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        .cloud-1 {
+            width: 120px;
+            height: 60px;
+            top: 20%;
+            left: 10%;
+            animation: float-1 25s linear infinite;
+        }
+
+        .cloud-2 {
+            width: 150px;
+            height: 70px;
+            top: 30%;
+            left: 60%;
+            animation: float-2 22s linear infinite;
+        }
+
+        .cloud-3 {
+            width: 100px;
+            height: 50px;
+            top: 15%;
+            left: 30%;
+            animation: float-3 30s linear infinite;
+        }
+
+        .cloud-4 {
+            width: 130px;
+            height: 65px;
+            top: 60%;
+            left: 75%;
+            animation: float-4 35s linear infinite;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+        }
+
+        .cloud::before {
+            width: 60%;
+            height: 100%;
+            top: -50%;
+            left: 20%;
+        }
+
+        .cloud::after {
+            width: 50%;
+            height: 100%;
+            top: -30%;
+            right: 20%;
+        }
+
+        @keyframes float-1 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(100px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes float-2 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-80px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes float-3 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(120px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes float-4 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-90px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Simple transition for page */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Forum container */
+        .container {
+            max-width: 900px;
+            background-color: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 30px;
+            margin-top: 80px;
+            margin-bottom: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Forum header */
+        .forum-header {
+            color: #3a7bd5;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .forum-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #3a7bd5, transparent);
+            border-radius: 3px;
+        }
+        
+        /* Search form & buttons */
+        .forum-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .search-form {
+            flex-grow: 1;
+            max-width: 500px;
+        }
+        
+        .input-group {
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 30px;
+            overflow: hidden;
+        }
+        
+        .form-control {
+            border: none;
+            padding: 10px 15px;
+            font-size: 0.95rem;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .form-control:focus {
+            box-shadow: none;
+            background-color: white;
+        }
+        
+        .btn {
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(40, 167, 69, 0.3);
+        }
+        
+        /* Forum list items */
+        .forum-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .forum-item {
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        .forum-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .forum-link {
+            display: block;
+            padding: 20px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .forum-title {
+            color: #3a7bd5;
+            font-size: 1.2rem;
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .forum-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .forum-author {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .forum-time {
+            font-size: 0.85rem;
+            color: #888;
+        }
+        
+        /* Pagination */
+        .pagination {
+            margin-top: 30px;
+            justify-content: center;
+        }
+        
+        .page-item .page-link {
+            color: #3a7bd5;
+            border-radius: 50%;
+            margin: 0 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .page-item.active .page-link {
+            background-color: #3a7bd5;
+            border-color: #3a7bd5;
+        }
+        
+        .page-item .page-link:hover {
+            background-color: rgba(58, 123, 213, 0.1);
+        }
+        
+        /* Hide user profile in menu */
+        .user-profile {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="fade-in">
+    <!-- Decorative clouds -->
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="cloud cloud-4"></div>
+
+    <!-- Include the newmenu component -->
+    {% include "Components/newmenu.html" %}
+
+    <div class="container">
+        <h1 class="forum-header">Diễn đàn học tập PTIT</h1>
+        
+        <div class="forum-controls">
+            <a href="{% url 'forum-add' %}" class="btn btn-success">
+                <i class="fas fa-plus me-2"></i>Thêm bài viết mới
+            </a>
+            <form method="GET" action="{% url 'forum-search' %}" class="search-form">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control" placeholder="Tìm kiếm bài viết..." value="{{ request.GET.q }}">
+                    <button class="btn btn-success" type="submit">
+                        <i class="fas fa-search me-1"></i> Tìm kiếm
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <ul class="forum-list">
+            {% for forum in object_list %}
+                <li class="forum-item">
+                    <a href="{% url 'forum-detail' forum.slug %}" class="forum-link">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="forum-title">{{ forum.title }}</h5>
+                        </div>
+                        <div class="forum-meta">
+                            <span class="forum-author">
+                                <i class="fas fa-user-circle me-1"></i> {{ forum.user.username }}
+                            </span>
+                            <small class="forum-time">
+                                <i class="far fa-clock me-1"></i> {{ forum.created_at|naturaltime }}
+                            </small>
+                        </div>
+                    </a>
+                </li>
+            {% empty %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>Chưa có bài viết nào trong diễn đàn.
+                </div>
+            {% endfor %}
+        </ul>
+
+        <!-- Pagination -->
+        <div class="pagination-container">
+            {% include 'pagination.html' %}
+        </div>
+    </div>
+
+    <script src="/static/cssQuan/bootstrap.bundle.min.js"></script>
+    <script>
+        // Tự động ẩn các thông báo sau 5 giây
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

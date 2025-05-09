@@ -1,0 +1,883 @@
+{% load static %}
+
+<!-- CSS cho menu -->
+<style>
+    /* Menu hamburger và nav overlay */
+    .menu-toggle {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 15px;
+        box-shadow: 0 3px 15px rgba(173, 216, 230, 0.5);
+        z-index: 100;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .menu-toggle:hover {
+        background: rgba(255, 255, 255, 0.95);
+        transform: scale(1.05);
+        box-shadow: 0 5px 20px rgba(173, 216, 230, 0.7);
+    }
+
+    .menu-toggle span {
+        position: relative;
+        width: 25px;
+        height: 3px;
+        background: #3a7bd5;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+    }
+
+    .menu-toggle span::before,
+    .menu-toggle span::after {
+        content: '';
+        position: absolute;
+        width: 25px;
+        height: 3px;
+        background: #3a7bd5;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+    }
+
+    .menu-toggle span::before {
+        transform: translateY(-8px);
+    }
+
+    .menu-toggle span::after {
+        transform: translateY(8px);
+    }
+
+    .menu-toggle.active span {
+        background: transparent;
+    }
+
+    .menu-toggle.active span::before {
+        transform: translateY(0px) rotate(45deg);
+    }
+
+    .menu-toggle.active span::after {
+        transform: translateY(0px) rotate(-45deg);
+    }
+
+    /* Thay đổi vị trí bắt đầu của nav-overlay */
+    .nav-overlay {
+        position: fixed;
+        top: 20px; /* Cùng vị trí với nút hamburger */
+        left: 20px; /* Cùng vị trí với nút hamburger */
+        width: 0;
+        height: 0;
+        background: transparent;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        z-index: 99;
+        overflow: hidden;
+        opacity: 0;
+        border-radius: 50%; /* Bắt đầu là hình tròn như nút hamburger */
+        transform-origin: top left; /* Điểm gốc là góc trên bên trái (vị trí nút hamburger) */
+        transform: scale(0);
+        clip-path: circle(0% at 25px 25px); /* Điểm trung tâm của nút hamburger */
+        box-shadow: none;
+    }
+
+    .nav-overlay.active {
+        top: 0;
+        left: 0;
+        width: 320px;
+        height: 100%;
+        opacity: 1;
+        border-radius: 0 80px 100px 0;
+        transform: scale(1);
+        clip-path: circle(150% at 25px 25px);
+        animation: circleExpand 0.6s forwards;
+    }
+
+    .nav-content {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        padding-top: 90px;
+        padding-left: 35px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.4s ease;
+        z-index: 101;
+    }
+
+    .nav-overlay.active .nav-content {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Thêm heading cho menu */
+    .nav-heading {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 25px;
+        position: relative;
+        padding-bottom: 10px;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: all 0.5s ease 0.1s;
+        text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .nav-heading:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: linear-gradient(90deg, #2c3e50, transparent);
+        border-radius: 3px;
+    }
+
+    .nav-overlay.active .nav-heading {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .nav-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        text-align: left;
+        width: 90%;
+        z-index: 110;
+    }
+
+    .nav-menu li {
+        margin: 15px 0;
+        opacity: 0;
+        transform: translateX(-20px);
+        transition: all 0.3s ease;
+    }
+
+    .nav-overlay.active .nav-menu li {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .nav-overlay.active .nav-menu li:nth-child(1) { transition-delay: 0.15s; }
+    .nav-overlay.active .nav-menu li:nth-child(2) { transition-delay: 0.25s; }
+    .nav-overlay.active .nav-menu li:nth-child(3) { transition-delay: 0.35s; }
+    .nav-overlay.active .nav-menu li:nth-child(4) { transition-delay: 0.45s; }
+    .nav-overlay.active .nav-menu li:nth-child(5) { transition-delay: 0.55s; }
+    .nav-overlay.active .nav-menu li:nth-child(6) { transition-delay: 0.65s; }
+
+    .nav-menu li a {
+        color: #2c3e50;
+        font-size: 1rem; /* Giảm cỡ chữ */
+        font-weight: 600;
+        text-decoration: none;
+        padding: 6px 5px 6px 12px; /* Giảm padding */
+        display: block;
+        transition: all 0.3s ease;
+        position: relative;
+        border-radius: 12px;
+        text-shadow: 0 1px 2px rgba(255,255,255,0.7);
+        background-color: rgba(255, 255, 255, 0.2); /* Trong suốt hơn */
+        margin-bottom: 5px;
+        margin-right: 15px; /* Tránh chạm viền */
+        backdrop-filter: blur(5px); /* Hiệu ứng kính mờ */
+        -webkit-backdrop-filter: blur(5px);
+        box-shadow: 0 2px 10px rgba(255, 255, 255, 0.15),
+                    inset 0 0 5px rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        width: 90%; /* Đảm bảo không chạm viền */
+    }
+
+    .nav-menu li a:hover {
+        color: #3a7bd5;
+        background-color: rgba(255, 255, 255, 0.4);
+        transform: translateX(3px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1),
+                    inset 0 0 10px rgba(255, 255, 255, 0.8);
+    }
+
+    .nav-menu li a::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 0;
+        background: #3a7bd5;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+    }
+
+    .nav-menu li a:hover::before {
+        height: 70%;
+    }
+
+    .logout-btn {
+        color: #3a7bd5 !important;
+        border: 2px solid rgba(58, 123, 213, 0.5) !important;
+        border-radius: 30px;
+        padding: 8px 20px !important;
+        margin-top: 20px;
+        display: inline-block !important;
+        width: auto !important;
+        text-align: center;
+        background-color: rgba(255, 255, 255, 0.5) !important;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .logout-btn:hover {
+        background-color: #3a7bd5 !important;
+        color: white !important;
+        transform: translateX(0px) !important;
+        box-shadow: 0 5px 15px rgba(58, 123, 213, 0.4);
+    }
+    
+    .logout-btn::before {
+        display: none;
+    }
+
+    .user-profile {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        align-items: center;
+        z-index: 10;
+    }
+
+    .user-profile img {
+        width: 45px;
+        height: 45px;
+        border: 2px solid white;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .user-profile img:hover {
+        transform: scale(1.1);
+        border-color: #ffcc00;
+    }
+
+    /* Responsive styles */
+    @media (max-width: 768px) {
+        .nav-menu li a {
+            font-size: 1.3rem;
+        }
+    }
+
+    /* CSS từ nhap.css cho giao diện biển và cá voi */
+    .ocean-container {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        /* Thay đổi gradient để không tạo hiệu ứng mờ dần ở dưới */
+        background: linear-gradient(to bottom, 
+            rgba(150, 199, 204, 0.15) 0%, 
+            rgba(195, 221, 216, 0.25) 50%, 
+            rgba(13, 63, 83, 0.25) 100%); /* Giảm độ đậm ở dưới để tránh mờ */
+        border-radius: 0 0 80% 0;
+        overflow: hidden;
+        z-index: 10;
+    }
+
+    .gradientContainer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: linear-gradient(to bottom, 
+            rgba(195, 229, 229, 0.2), 
+            rgba(13, 63, 83, 0.2)); /* Giảm độ đậm ở cuối */
+        z-index: 11;
+    }
+
+    .overlay {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        /* Bỏ gradient tạo hiệu ứng mờ phần dưới */
+        background: transparent;
+        z-index: 12;
+    }
+
+    .gradient {
+        position: absolute;
+        width: 400%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        transform: translateX(0) rotate(0deg);
+        animation: none;
+        transform-style: preserve-3d;
+        z-index: 13;
+    }
+
+    @keyframes gradient {
+        0% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+
+    .ray {
+        display: none;
+    }
+
+    .whaleContainer {
+        position: absolute;
+        z-index: 30;
+        animation: whaleTranslate 15s linear infinite;
+        pointer-events: none;
+    }
+
+    .whalePos {
+        position: absolute;
+    }
+
+    .whalePos.size1 {
+        top: 10%; /* Giảm từ 20% xuống 10% */
+        left: -80px;
+    }
+
+    .whalePos.size2 {
+        top: 60%;
+        left: -100px; /* Thay đổi từ -40px sang -100px */
+    }
+
+    .whalePos.size3 {
+        top: 35%; /* Giảm từ 40% xuống 35% */
+        left: -40px; /* Thay đổi từ -60px sang -40px */
+    }
+
+    .whalePos.size4 {
+        top: 85%; /* Tăng từ 80% lên 85% */
+        left: -120px; /* Thay đổi từ -20px sang -120px */
+    }
+
+    .whaleRotate {
+        position: relative;
+        width: 245px;
+        height: 110px;
+        animation-duration: 4s;
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
+        transform-origin: center center;
+    }
+
+    .whaleRotate.size1 {
+        transform: scale(0.2);
+        animation-name: whaleMovementLarge;
+    }
+
+    .whaleRotate.size2 {
+        transform: scale(0.15);
+        animation-name: whaleMovementMedium;
+    }
+
+    @keyframes whaleTranslate {
+        0% {
+            transform: translateX(-50px);
+        }
+        100% {
+            transform: translateX(400px);
+        }
+    }
+
+    @keyframes whaleMovementLarge {
+        0% {
+            transform: rotate(0) scale(0.2);
+        }
+        100% {
+            transform: rotate(10deg) scale(0.2);
+        }
+    }
+
+    @keyframes whaleMovementMedium {
+        0% {
+            transform: rotate(0) scale(0.15);
+        }
+        100% {
+            transform: rotate(10deg) scale(0.15);
+        }
+    }
+
+    .whale {
+        position: absolute;
+        width: inherit;
+        height: inherit;
+        background: radial-gradient(at 40% 20%, #95d6df 0%,#95d6df 35%,#6db3c2 35%,#6db3c2 60%,#6db3c2 70%,#407a8b 70%,#407a8b 100%);
+        clip-path: polygon(15% 0%, 18.5% 20%, 19% 37%, 27% 46.5%, 33% 46.5%, 42.5% 37%, 43% 26.5%, 50.5% 28.5%, 65.5% 17%, 88.5% 12.5%, 97.5% 22.5%, 100% 49.5%, 97% 65.5%, 89.5% 81.5%, 64.5% 86.5%, 43.5% 80%, 23% 59.5%, 15.5% 41.5%, 8% 40%, 1.5% 28.5%, 6.5% 25%, 12.5% 26.5%, 12% 14%);
+    }
+
+    .fin {
+        position: absolute;
+        top: 75%;
+        left: 50%;
+        z-index: 31;
+        width: 50px;
+        height: 30px;
+        background: #407A8B;
+        transform-origin: center top;
+        clip-path: polygon(30% 50%, 60% 0, 100% 0%, 80% 60%, 60% 80%, 0 100%);
+        animation: fin 2s alternate infinite linear;
+    }
+
+    @keyframes fin {
+        0% {
+            transform: rotate3d(0, 0, 0, 0deg);
+        }
+        100% {
+            transform: rotate3d(1, 1, 1, 30deg);
+        }
+    }
+
+    .bubbleContainer {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 20;
+        pointer-events: none;
+    }
+
+    .bubbleY {
+        display: inline-block;
+        position: absolute;
+        z-index: 21;
+        animation: bubbleY 3s infinite linear;
+    }
+
+    .bubbleX {
+        display: inline-block;
+        width: 6px; /* Tăng kích thước */
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.9); /* Tăng độ đậm */
+        box-shadow: 0 0 3px rgba(255, 255, 255, 0.8); /* Thêm ánh sáng */
+        animation: bubbleX 4s infinite linear;
+    }
+
+    @keyframes bubbleY {
+        0% {
+            transform: translateY(100%);
+            opacity: 0.6;
+        }
+        100% {
+            transform: translateY(-100px);
+            opacity: 0;
+        }
+        animation-duration: 2s; /* Giảm thời gian để tăng tốc độ */
+    }
+
+    @keyframes bubbleX {
+        0% { transform: translateX(0); }
+        50% { transform: translateX(10px); }
+        100% { transform: translateX(0); }
+    }
+
+    .triangle-container {
+        display: none;
+    }
+
+    .triangle-bar {
+        display: none;
+    }
+
+    .triangle {
+        display: none;
+    }
+
+    /* Tạo vị trí cho bubbles */
+    .bubbleY1 { top: 20%; left: 10%; animation-delay: 0s; }
+    .bubbleY2 { top: 40%; left: 25%; animation-delay: 1s; }
+    .bubbleY3 { top: 60%; left: 15%; animation-delay: 0.5s; }
+    .bubbleY4 { top: 30%; left: 35%; animation-delay: 1.5s; }
+    .bubbleY5 { top: 70%; left: 20%; animation-delay: 2s; }
+    .bubbleY6 { top: 50%; left: 5%; animation-delay: 0.3s; }
+    .bubbleY7 { top: 55%; left: 30%; animation-delay: 1.2s; }
+    .bubbleY8 { top: 25%; left: 18%; animation-delay: 0.8s; }
+    .bubbleY9 { top: 65%; left: 22%; animation-delay: 2.3s; }
+    .bubbleY10 { top: 35%; left: 12%; animation-delay: 1.7s; }
+    .bubbleY11 { top: 15%; left: 8%; animation-delay: 0.2s; }
+    .bubbleY12 { top: 45%; left: 28%; animation-delay: 1.3s; }
+    .bubbleY13 { top: 65%; left: 12%; animation-delay: 0.7s; }
+    .bubbleY14 { top: 35%; left: 38%; animation-delay: 1.8s; }
+    .bubbleY15 { top: 75%; left: 25%; animation-delay: 2.2s; }
+    .bubbleY16 { top: 55%; left: 7%; animation-delay: 0.4s; }
+    .bubbleY17 { top: 48%; left: 32%; animation-delay: 1.5s; }
+    .bubbleY18 { top: 28%; left: 15%; animation-delay: 0.9s; }
+    .bubbleY19 { top: 68%; left: 26%; animation-delay: 2.5s; }
+    .bubbleY20 { top: 38%; left: 16%; animation-delay: 1.9s; }
+
+    /* Thêm class và CSS cho các con cá nhỏ */
+    .fish {
+        position: absolute;
+        width: 20px;
+        height: 10px;
+        background: #6db3c2;
+        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        z-index: 25;
+        animation: fishSwim 8s linear infinite;
+    }
+
+    .fish::before {
+        content: '';
+        position: absolute;
+        top: 3px;
+        right: -5px;
+        width: 8px;
+        height: 4px;
+        background: #6db3c2;
+        clip-path: polygon(0 0, 0% 100%, 100% 50%);
+    }
+
+    .fish::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 4px;
+        width: 2px;
+        height: 2px;
+        background: #407a8b;
+        border-radius: 50%;
+    }
+
+    .fish1 { top: 8%; left: 5%; animation-delay: 0s; background: #95d6df; }
+    .fish2 { top: 25%; left: 15%; animation-delay: 4s; background: #6db3c2; }
+    .fish3 { top: 42%; left: 10%; animation-delay: 2s; background: #407a8b; }
+    .fish4 { top: 59%; left: 20%; animation-delay: 6s; background: #95d6df; }
+    .fish5 { top: 76%; left: 8%; animation-delay: 1s; background: #6db3c2; }
+    .fish6 { top: 17%; left: 25%; animation-delay: 5s; background: #407a8b; }
+    .fish7 { top: 34%; left: 30%; animation-delay: 3s; background: #95d6df; }
+    .fish8 { top: 67%; left: 2%; animation-delay: 7s; background: #6db3c2; }
+
+    @keyframes fishSwim {
+        0% {
+            transform: translateX(-30px) scaleX(1);
+        }
+        49% {
+            transform: translateX(350px) scaleX(1);
+        }
+        50% {
+            transform: translateX(350px) scaleX(-1);
+        }
+        99% {
+            transform: translateX(-30px) scaleX(-1);
+        }
+        100% {
+            transform: translateX(-30px) scaleX(1);
+        }
+    }
+
+    /* Animation cho cá bơi ngược lại */
+    @keyframes fishSwimReverse {
+        0% {
+            transform: translateX(350px) scaleX(-1);
+        }
+        49% {
+            transform: translateX(-30px) scaleX(-1);
+        }
+        50% {
+            transform: translateX(-30px) scaleX(1);
+        }
+        99% {
+            transform: translateX(350px) scaleX(1);
+        }
+        100% {
+            transform: translateX(350px) scaleX(-1);
+        }
+    }
+
+    /* Áp dụng animation ngược cho các cá có số chẵn */
+    .fish:nth-child(even) {
+        animation: fishSwimReverse 8s linear infinite;
+    }
+
+    /* Áp dụng animation bình thường cho các cá có số lẻ */
+    .fish:nth-child(odd) {
+        animation: fishSwim 8s linear infinite;
+    }
+
+    /* Hiệu ứng nước tràn vào/rút đi */
+    @keyframes waveIn {
+        0% {
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+            opacity: 0;
+        }
+        40% {
+            clip-path: polygon(0 0, 30% 0, 25% 100%, 0 100%);
+            opacity: 0.6;
+        }
+        70% {
+            clip-path: polygon(0 0, 60% 0, 50% 100%, 0 100%);
+            opacity: 0.8;
+        }
+        100% {
+            clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%);
+            opacity: 1;
+        }
+    }
+
+    @keyframes waveOut {
+        0% {
+            clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%);
+            opacity: 1;
+        }
+        30% {
+            clip-path: polygon(0 0, 60% 0, 50% 100%, 0 100%);
+            opacity: 0.8;
+        }
+        60% {
+            clip-path: polygon(0 0, 30% 0, 25% 100%, 0 100%);
+            opacity: 0.4;
+        }
+        100% {
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+            opacity: 0;
+        }
+    }
+
+    /* Thay đổi animation để mở rộng từ nút hamburger */
+    @keyframes circleExpand {
+        0% {
+            clip-path: circle(0% at 25px 25px);
+            opacity: 0;
+        }
+        40% {
+            clip-path: circle(30% at 25px 25px);
+            opacity: 0.6;
+        }
+        70% {
+            clip-path: circle(70% at 25px 25px);
+            opacity: 0.8;
+        }
+        100% {
+            clip-path: circle(150% at 25px 25px);
+            opacity: 1;
+        }
+    }
+
+    @keyframes circleCollapse {
+        0% {
+            clip-path: circle(150% at 25px 25px);
+            opacity: 1;
+        }
+        30% {
+            clip-path: circle(70% at 25px 25px);
+            opacity: 0.8;
+        }
+        60% {
+            clip-path: circle(30% at 25px 25px);
+            opacity: 0.4;
+        }
+        100% {
+            clip-path: circle(0% at 25px 25px);
+            opacity: 0;
+        }
+    }
+
+    /* Thay đổi animation cho fish để di chuyển với tốc độ khác nhau */
+    .fish:nth-child(1) { animation-duration: 7s; }
+    .fish:nth-child(2) { animation-duration: 9s; }
+    .fish:nth-child(3) { animation-duration: 8s; }
+    .fish:nth-child(4) { animation-duration: 10s; }
+    .fish:nth-child(5) { animation-duration: 7.5s; }
+    .fish:nth-child(6) { animation-duration: 9.5s; }
+    .fish:nth-child(7) { animation-duration: 8.5s; }
+    .fish:nth-child(8) { animation-duration: 10.5s; }
+</style>
+
+<!-- Menu Toggle Button -->
+<div class="menu-toggle">
+    <span></span>
+</div>
+
+<!-- Navigation Overlay -->
+<div class="nav-overlay">
+    <!-- Giao diện biển và cá voi -->
+    <div class="ocean-container">
+        <div class="gradientContainer">
+            <div class="overlay"></div>
+            <div class="gradient">
+                <!-- Tạo các tia sáng -->
+                <span class="ray ray1"></span>
+                <span class="ray ray2"></span>
+                <span class="ray ray3"></span>
+                <span class="ray ray4"></span>
+                <span class="ray ray5"></span>
+                <span class="ray ray6"></span>
+                <span class="ray ray7"></span>
+                <span class="ray ray8"></span>
+                <span class="ray ray9"></span>
+                <span class="ray ray10"></span>
+                <span class="ray ray11"></span>
+                <span class="ray ray12"></span>
+                <span class="ray ray13"></span>
+            </div>
+        </div>
+        
+        <!-- Thêm bong bóng -->
+        <div class="bubbleContainer">
+            <span class="bubbleY bubbleY1"><span class="bubbleX"></span></span>
+            <span class="bubbleY bubbleY2"><span class="bubbleX"></span></span>
+            <span class="bubbleY bubbleY3"><span class="bubbleX"></span></span>
+            <span class="bubbleY bubbleY4"><span class="bubbleX"></span></span>
+            <span class="bubbleY bubbleY5"><span class="bubbleX"></span></span>
+            <span class="bubbleY bubbleY6"><span class="bubbleX"></span></span>
+            <span class="bubbleY bubbleY7"><span class="bubbleX"></span></span>
+            <span class="bubbleY bubbleY8"><span class="bubbleX"></span></span>
+            <span class="bubbleY bubbleY9"><span class="bubbleX"></span></span>
+            <span class="bubbleY bubbleY10"><span class="bubbleX"></span></span>
+            <span class="bubbleY bubbleY11"><span class="bubbleX"></span></span>
+            <span class="bubbleY bubbleY12"><span class="bubbleX"></span></span>
+            <span class="bubbleY bubbleY13"><span class="bubbleX"></span></span>
+            <span class="bubbleY bubbleY14"><span class="bubbleX"></span></span>
+            <span class="bubbleY bubbleY15"><span class="bubbleX"></span></span>
+            <span class="bubbleY bubbleY16"><span class="bubbleX"></span></span>
+            <span class="bubbleY bubbleY17"><span class="bubbleX"></span></span>
+            <span class="bubbleY bubbleY18"><span class="bubbleX"></span></span>
+            <span class="bubbleY bubbleY19"><span class="bubbleX"></span></span>
+            <span class="bubbleY bubbleY20"><span class="bubbleX"></span></span>
+        </div>
+        
+        <!-- Thêm tam giác -->
+        <div class="triangle-container">
+            <div class="triangle-bar"></div>
+            <span class="triangle"></span>
+            <span class="triangle"></span>
+            <span class="triangle"></span>
+            <span class="triangle"></span>
+            <span class="triangle"></span>
+            <span class="triangle"></span>
+            <span class="triangle"></span>
+            <span class="triangle"></span>
+        </div>
+        
+        <!-- Thêm cá voi -->
+        <div class="whaleContainer">
+            <div class="whalePos size1">
+                <div class="whaleRotate size1">
+                    <div class="whale"></div>
+                    <div class="fin"></div>
+                </div>
+            </div>
+            <div class="whalePos size2">
+                <div class="whaleRotate size2">
+                    <div class="whale"></div>
+                    <div class="fin"></div>
+                </div>
+            </div>
+            <div class="whalePos size3">
+                <div class="whaleRotate size2">
+                    <div class="whale"></div>
+                    <div class="fin"></div>
+                </div>
+            </div>
+            <div class="whalePos size4">
+                <div class="whaleRotate size2">
+                    <div class="whale"></div>
+                    <div class="fin"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thêm cá nhỏ -->
+        <div class="fishContainer">
+            <div class="fish fish1"></div>
+            <div class="fish fish2"></div>
+            <div class="fish fish3"></div>
+            <div class="fish fish4"></div>
+            <div class="fish fish5"></div>
+            <div class="fish fish6"></div>
+            <div class="fish fish7"></div>
+            <div class="fish fish8"></div>
+        </div>
+    </div>
+    
+    <!-- Nội dung menu -->
+    <div class="nav-content">
+        <h2 class="nav-heading">Danh mục</h2>
+        <ul class="nav-menu">
+            <li><a href="{% url 'welcome' %}"><i class='bx bxs-home'></i> Trang chủ</a></li>
+            <li><a href="{% url 'my_classes' %}"><i class='bx bxs-graduation'></i> Lớp học</a></li>
+            <li><a href="{% url 'library_home' %}"><i class='bx bxs-book'></i> Thư viện sách</a></li>
+            <li><a href="{% url 'profile' request.user.username %}"><i class='bx bxs-user-circle'></i> Hồ sơ</a></li>
+            {% if request.user.is_superuser %}
+            <li><a href="{% url 'account_management' %}"><i class='bx bxs-user-account'></i> Quản lý tài khoản</a></li>
+            {% endif %}
+            <li><a href="{% url 'forum-list' %}"><i class='bx bxs-chat'></i> Diễn đàn</a></li>
+            <li><a href="{% url 'logout' %}" class="logout-btn"><i class='bx bx-log-out'></i> Đăng xuất</a></li>
+        </ul>
+    </div>
+</div>
+
+<!-- JavaScript for the menu -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navOverlay = document.querySelector('.nav-overlay');
+        
+        if (menuToggle && navOverlay) {
+            menuToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                this.classList.toggle('active');
+                navOverlay.classList.toggle('active');
+                
+                if (navOverlay.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                    navOverlay.style.animation = 'circleExpand 0.6s forwards';
+                } else {
+                    document.body.style.overflow = 'auto';
+                    navOverlay.style.animation = 'circleCollapse 0.5s forwards';
+                }
+            });
+            
+            // Close menu when clicking on a menu item
+            const menuLinks = document.querySelectorAll('.nav-menu a');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    menuToggle.classList.remove('active');
+                    navOverlay.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!navOverlay.contains(e.target) && !menuToggle.contains(e.target)) {
+                    menuToggle.classList.remove('active');
+                    navOverlay.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+            
+            // Ngăn sự kiện click bên trong nav-overlay lan ra ngoài
+            navOverlay.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+    });
+</script>

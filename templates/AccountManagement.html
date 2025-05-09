@@ -1,0 +1,672 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Management</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-image: url('/static/images/Ptit.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* Lớp overlay làm tối ảnh nền */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 20, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: -1;
+        }
+
+        /* Clouds for background */
+        .cloud {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1);
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        .cloud-1 {
+            width: 120px;
+            height: 60px;
+            top: 20%;
+            left: 10%;
+            animation: float-1 25s linear infinite;
+        }
+
+        .cloud-2 {
+            width: 150px;
+            height: 70px;
+            top: 30%;
+            left: 60%;
+            animation: float-2 22s linear infinite;
+        }
+
+        .cloud-3 {
+            width: 100px;
+            height: 50px;
+            top: 15%;
+            left: 30%;
+            animation: float-3 30s linear infinite;
+        }
+
+        .cloud-4 {
+            width: 130px;
+            height: 65px;
+            top: 60%;
+            left: 75%;
+            animation: float-4 35s linear infinite;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+        }
+
+        .cloud::before {
+            width: 60%;
+            height: 100%;
+            top: -50%;
+            left: 20%;
+        }
+
+        .cloud::after {
+            width: 50%;
+            height: 100%;
+            top: -30%;
+            right: 20%;
+        }
+
+        @keyframes float-1 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(100px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes float-2 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-80px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes float-3 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(120px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes float-4 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-90px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Simple transition for page */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Container with glassmorphism effect */
+        .container {
+            background-color: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 30px;
+            margin-top: 80px;
+            margin-bottom: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Account management header */
+        .account-header {
+            color: #3a7bd5;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .account-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #3a7bd5, transparent);
+            border-radius: 3px;
+        }
+        
+        /* Table Styles */
+        .table {
+            background-color: rgba(255, 255, 255, 0.6) !important;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .table-striped tbody tr {
+            background-color: rgba(255, 255, 255, 0.4) !important;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(255, 255, 255, 0.3) !important;
+        }
+        
+        .table-striped tbody tr:nth-of-type(even) {
+            background-color: rgba(255, 255, 255, 0.4) !important;
+        }
+        
+        .table > thead > tr {
+            background-color: rgba(58, 123, 213, 0.7) !important;
+            color: white;
+        }
+        
+        .table > thead > tr > th {
+            border-bottom: none;
+            padding: 15px;
+            font-weight: 600;
+        }
+        
+        .table > tbody > tr > td {
+            padding: 12px 15px;
+            vertical-align: middle;
+        }
+        
+        /* Button Styles */
+        .btn {
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: #3a7bd5;
+            border-color: #3a7bd5;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2a6ac5;
+            border-color: #2a6ac5;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(58, 123, 213, 0.3);
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(220, 53, 69, 0.3);
+        }
+        
+        .btn-outline-success {
+            color: #28a745;
+            border-color: #28a745;
+        }
+        
+        .btn-outline-success:hover {
+            background-color: #28a745;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(40, 167, 69, 0.3);
+        }
+        
+        /* Search form */
+        .form-control {
+            border: none;
+            border-radius: 30px;
+            padding: 10px 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
+        }
+        
+        /* Modal Styles */
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eaeaea;
+            border-radius: 20px 20px 0 0;
+            padding: 15px 20px;
+        }
+        
+        .modal-title {
+            color: #3a7bd5;
+            font-weight: 700;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid #eaeaea;
+            border-radius: 0 0 20px 20px;
+            padding: 15px 20px;
+        }
+        
+        /* Loading Message */
+        #loading-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            padding: 15px 25px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            border-radius: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.5); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 0, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+        }
+        
+        /* Hide user profile in menu */
+        .user-profile {
+            display: none;
+        }
+    </style>
+</head>
+<body class="fade-in">
+    <!-- Decorative clouds -->
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="cloud cloud-4"></div>
+
+    <!-- Include the newmenu component -->
+    {% include "Components/newmenu.html" %}
+
+    <div class="container mt-4">
+        <h1 class="account-header">Quản lý tài khoản</h1>
+        
+        <!-- Messages block -->
+        {% if messages %}
+        <div class="alert-container mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="d-flex justify-content-between mb-4">
+            <!-- Add Account button -->
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAccountModal">
+                <i class="fas fa-user-plus me-2"></i>Thêm tài khoản
+            </button>
+
+            <!-- Search form -->
+            <form class="d-flex" method="GET" action="{% url 'account_management' %}">
+                <div class="input-group">
+                    <input class="form-control" type="search" placeholder="Tìm kiếm..." aria-label="Search" name="query">
+                    <button class="btn btn-outline-success" type="submit">
+                        <i class="fas fa-search me-1"></i>Tìm kiếm
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Users Table -->
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Họ và tên</th>
+                        <th scope="col">Mã sinh viên</th>
+                        <th scope="col">Lớp</th>
+                        <th scope="col">Tùy chọn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.first_name }} {{ user.last_name }}</td>
+                        <td>{{ user.profile.studen_id }}</td>
+                        <td>{{ user.profile.user_class }}</td>
+                        <td>
+                            {% if not user.is_staff and not user.is_superuser %}
+                            <form method="POST" action="{% url 'delete_user' user.id %}" onsubmit="return confirmDelete(this, '{{ captcha }}', '{{ user.username }}', '{{ user.first_name }} {{ user.last_name }}');">
+                                {% csrf_token %}
+                                <input type="hidden" name="captcha">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash-alt me-1"></i>Xóa
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Account Modal -->
+    <div class="modal fade" id="addAccountModal" tabindex="-1" aria-labelledby="addAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="uploadForm" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addAccountModalLabel">Thêm tài khoản</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- File upload input -->
+                        <h5 class="mb-3">Tải lên file Excel mẫu 1</h5>
+                        <div class="mb-3">
+                            <label for="excelFile1" class="form-label">Tải lên file Excel</label>
+                            <input class="form-control" type="file" id="excelFile1" name="excel_file1" accept=".xlsx, .xls">
+                        </div>
+                        <div class="mb-4">
+                            <img src="/static/images/sampleupload1.png" alt="Sample Image" class="img-fluid border rounded">
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- File upload input for sample 2 -->
+                        <h5 class="mb-3">Tải lên file Excel mẫu 2</h5>
+                        <div class="mb-3">
+                            <label for="excelFile2" class="form-label">Tải lên file Excel</label>
+                            <input class="form-control" type="file" id="excelFile2" name="excel_file2" accept=".xlsx, .xls">
+                        </div>
+                        <div class="mb-4">
+                            <img src="/static/images/sampleupload2.png" alt="Sample Image" class="img-fluid border rounded">
+                        </div>
+
+                        <!-- Preview table -->
+                        <hr class="my-4">
+                        <h5 class="mb-3">Xem trước dữ liệu</h5>
+                        <div id="previewTable" style="max-height: 400px; overflow-y: auto;" class="border rounded">
+                            <!-- The table will be injected here via JavaScript -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <!-- Add Accounts button -->
+                        <button type="button" class="btn btn-success" id="createAccountsBtn" style="display:none;" onclick="confirmAddAccounts();">
+                            <i class="fas fa-plus-circle me-2"></i>Thêm tài khoản
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/cssQuan/bootstrap.bundle.min.js"></script>
+    <script>
+        function confirmDelete(form, captcha, username, fullName) {
+            const message = `Vui lòng nhập mã xác nhận để xóa người dùng ${username} (${fullName}):\n\n` +
+                            `${captcha}`;
+            const userCaptcha = prompt(message, '');
+            if (userCaptcha) {
+                form.elements['captcha'].value = userCaptcha;
+                return true;
+            }
+            return false;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            let accountCreationTaskId = localStorage.getItem('accountCreationTaskId');
+            if (accountCreationTaskId) {
+                startAccountCreationProgressPolling(accountCreationTaskId);
+                showLoadingMessage();
+            }
+    
+            // Excel file upload and user list preview
+            document.getElementById('excelFile1').addEventListener('change', handleFileUpload);
+            document.getElementById('excelFile2').addEventListener('change', handleFileUpload);
+
+            // Tự động ẩn thông báo sau 5 giây
+            setTimeout(function() {
+                var alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    var bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+        });
+    
+        function handleFileUpload() {
+            var formData = new FormData(document.getElementById('uploadForm'));
+            fetch("{% url 'upload_excel' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    var usersData = data.users_data;
+                    var tableHTML = `<table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Username</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Student ID</th>
+                                <th>Class</th>
+                                <th>Email</th>
+                                <th>Password</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+                    usersData.forEach((user, index) => {
+                        tableHTML += `<tr>
+                            <td>${index + 1}</td>
+                            <td>${user.username}</td>
+                            <td>${user.first_name}</td>
+                            <td>${user.last_name}</td>
+                            <td>${user.student_id}</td>
+                            <td>${user.user_class}</td>
+                            <td>${user.email}</td>
+                            <td>${user.password}</td>
+                        </tr>`;
+                    });
+                    tableHTML += '</tbody></table>';
+                    document.getElementById('previewTable').innerHTML = tableHTML;
+                    // Show the "Add Accounts" button
+                    document.getElementById('createAccountsBtn').style.display = 'inline-block';
+                    // Save users data to localStorage
+                    localStorage.setItem('usersData', JSON.stringify(usersData));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Đã xảy ra lỗi khi xử lý file.');
+            });
+        }
+    
+        function confirmAddAccounts() {
+            if (confirm('Bạn có chắc muốn tạo các tài khoản này không?')) {
+                createAccounts();
+            }
+        }
+    
+        function createAccounts() {
+            fetch("{% url 'create_accounts' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.task_id) {
+                    let accountCreationTaskId = data.task_id;
+                    localStorage.setItem('accountCreationTaskId', accountCreationTaskId);
+                    startAccountCreationProgressPolling(accountCreationTaskId);
+                    showLoadingMessage();
+                    // Close the modal
+                    var modal = bootstrap.Modal.getInstance(document.getElementById('addAccountModal'));
+                    modal.hide();
+                } else {
+                    alert('Không thể bắt đầu tạo tài khoản.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Đã xảy ra lỗi khi tạo tài khoản.');
+            });
+        }
+    
+        function startAccountCreationProgressPolling(taskId) {
+            let accountCreationInterval = setInterval(function() {
+                checkAccountCreationProgress(taskId, accountCreationInterval);
+            }, 1000);
+        }
+    
+        function checkAccountCreationProgress(taskId, interval) {
+            fetch(`{% url 'check_account_creation_progress' %}?task_id=${taskId}`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    clearInterval(interval);
+                    localStorage.removeItem('accountCreationTaskId');
+                    hideLoadingMessage();
+                    alert(data.error);
+                } else {
+                    updateLoadingMessage(data.current, data.total);
+    
+                    if (data.completed) {
+                        clearInterval(interval);
+                        localStorage.removeItem('accountCreationTaskId');
+                        hideLoadingMessage();
+                        // Optionally, reload the page to reflect new accounts
+                        window.location.reload();
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                clearInterval(interval);
+                localStorage.removeItem('accountCreationTaskId');
+                hideLoadingMessage();
+                alert('Đã xảy ra lỗi khi kiểm tra tiến trình.');
+            });
+        }
+    
+        function showLoadingMessage() {
+            let loadingDiv = document.getElementById('loading-message');
+            if (!loadingDiv) {
+                loadingDiv = document.createElement('div');
+                loadingDiv.id = 'loading-message';
+                loadingDiv.style.position = 'fixed';
+                loadingDiv.style.top = '20px';
+                loadingDiv.style.right = '20px';
+                loadingDiv.style.zIndex = '9999';
+                loadingDiv.style.padding = '10px 20px';
+                loadingDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                loadingDiv.style.color = '#fff';
+                loadingDiv.style.borderRadius = '5px';
+                loadingDiv.innerText = 'Đang tạo tài khoản: 0/0';
+                document.body.appendChild(loadingDiv);
+            }
+        }
+    
+        function updateLoadingMessage(current, total) {
+            let loadingDiv = document.getElementById('loading-message');
+            if (loadingDiv) {
+                loadingDiv.innerText = `Đang tạo tài khoản: ${current}/${total}`;
+            }
+        }
+    
+        function hideLoadingMessage() {
+            let loadingDiv = document.getElementById('loading-message');
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+        }
+    </script>
+</body>
+</html>

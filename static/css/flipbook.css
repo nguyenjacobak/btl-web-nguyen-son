@@ -1,0 +1,331 @@
+/* Turn.js Flipbook Styles */
+
+/* Book container */
+.flipbook-container {
+    perspective: 1500px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Book basic styles */
+#flipbook {
+    transform-style: preserve-3d;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+}
+
+#flipbook .turn-page {
+    background-color: #fff;
+    background-size: 100% 100%;
+}
+
+/* CSS for shadow effect */
+#flipbook.animated {
+    transition: transform 0.5s;
+}
+
+#flipbook.hard .hard {
+    transition: transform 0.6s;
+    transform-origin: left;
+}
+
+.shadow {
+    position: absolute;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+    border-radius: 5px;
+}
+
+/* Hover states */
+.flipbook-container:hover {
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.4);
+}
+
+/* Page content */
+.page-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.page-content canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Thay đổi thành contain để hiển thị đầy đủ */
+}
+
+/* Thêm hiệu ứng gáy sách - phần giữa có bóng đổ */
+.book-spine {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 30px;
+    transform: translateX(-50%);
+    background: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(0, 0, 0, 0.3) 20%,
+        rgba(0, 0, 0, 0.4) 49%,
+        rgba(0, 0, 0, 0.3) 50%,
+        rgba(0, 0, 0, 0.1) 80%,
+        rgba(0, 0, 0, 0.0) 100%
+    );
+    z-index: 100;
+    pointer-events: none;
+}
+
+/* Tạo hiệu ứng gáy sách ở mỗi trang */
+.turn-page-wrapper:nth-child(odd) {
+    box-shadow: inset -7px 0 20px -5px rgba(0, 0, 0, 0.4);
+}
+
+.turn-page-wrapper:nth-child(even) {
+    box-shadow: inset 7px 0 20px -5px rgba(0, 0, 0, 0.4);
+}
+
+/* Các trang bên trái có đổ bóng về bên phải tại vị trí gáy sách */
+.turn-page-wrapper.odd .page {
+    background: linear-gradient(to right, #fff 95%, #f0f0f0 98%, #d9d9d9 100%);
+}
+
+/* Các trang bên phải có đổ bóng về bên trái tại vị trí gáy sách */
+.turn-page-wrapper.even .page {
+    background: linear-gradient(to left, #fff 95%, #f0f0f0 98%, #d9d9d9 100%);
+}
+
+/* Custom styles for book cover */
+.cover-front, .cover-back {
+    background: linear-gradient(145deg, #3a7bd5, #00d2ff);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    text-align: center;
+    padding: 30px;
+}
+
+.cover-front h1 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.cover-front p {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.cover-front .book-image {
+    max-width: 80%;
+    max-height: 60%;
+    margin: 20px 0;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    object-fit: contain; /* Đảm bảo hiển thị đầy đủ hình ảnh */
+}
+
+/* Cải thiện hiển thị hình ảnh bìa sách */
+.cover-image-container {
+    width: 80%;
+    height: 60%;
+    margin: 15px auto;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Cải tiến hiển thị hình ảnh bìa sách để vừa vặn khung */
+.cover-image-container {
+    width: 80%;
+    height: 60%;
+    margin: 15px auto;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Container cho trang bìa toàn màn hình */
+.cover-image-container.full-cover {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.cover-front .book-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Hiển thị toàn bộ hình ảnh */
+}
+
+/* Điều chỉnh style cho trang bìa không có nội dung văn bản */
+.cover-front {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0; /* Loại bỏ padding để ảnh lấp đầy không gian */
+    text-align: center;
+    background: linear-gradient(145deg, #3a7bd5, #00d2ff);
+    color: white;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Kiểu cho trang bìa đầy đủ */
+.cover-front.full-cover {
+    padding: 0;
+}
+
+.cover-front .book-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Hiển thị toàn bộ hình ảnh */
+}
+
+.cover-front {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 30px;
+    text-align: center;
+    background: linear-gradient(145deg, #3a7bd5, #00d2ff);
+    color: white;
+    height: 100%;
+}
+
+.cover-front h1 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+}
+
+.cover-front p {
+    font-size: 14px;
+    opacity: 0.8;
+    margin: 5px 0;
+}
+
+/* Fallback cho lỗi hình ảnh */
+.book-image[src=""] {
+    display: none;
+}
+
+/* Hard cover styling */
+.hard {
+    background: #3a7bd5;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    background-image: url('data:image/png;base64,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');
+    background-repeat: repeat;
+}
+
+/* Buttons inside book */
+.zoom-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+.zoom-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.1);
+}
+
+/* Page number badge */
+.page-number {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    z-index: 10;
+}
+
+/* Loader animation */
+.flipbook-loading {
+    text-align: center;
+}
+
+.flipbook-loading i {
+    font-size: 50px;
+    margin-bottom: 15px;
+    animation: spin 2s infinite linear;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* When page is turning */
+.turn-page-wrapper {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.turn-page-wrapper.hard {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .cover-front h1 {
+        font-size: 18px;
+    }
+    
+    .cover-front p {
+        font-size: 12px;
+    }
+    
+    .page-number {
+        font-size: 10px;
+        padding: 2px 8px;
+    }
+}

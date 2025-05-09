@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- MathJax scripts are now in captcha.html -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Dancing+Script:wght@700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #d6e6ff;
+            background-image: url('/static/images/Ptit.jpg');
+            background-size: cover;
+            /* Thay đổi sang cover để lấp đầy màn hình */
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Welcome text */
+        .welcome-text {
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Dancing Script', cursive;
+            font-size: 4.5rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5); /* Giảm độ đậm xuống 0.5 */
+            text-shadow:
+                0 0 15px rgba(255, 70, 70, 0.6),
+                0 0 30px rgba(255, 70, 70, 0.4),
+                0 0 45px rgba(255, 70, 70, 0.3);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            z-index: 5; /* Giảm z-index xuống thấp hơn form (form có z-index: 10) */
+            opacity: 0.6; /* Giảm opacity xuống */
+            text-align: center;
+            filter: blur(2px); /* Tăng độ blur lên */
+            animation: float-text 8s ease-in-out infinite;
+            pointer-events: none; /* Quan trọng: Cho phép click xuyên qua */
+        }
+
+        @keyframes float-text {
+            0% {
+                transform: translateX(-52%) translateY(0px);
+            }
+
+            25% {
+                transform: translateX(-48%) translateY(-5px);
+            }
+
+            50% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+
+            75% {
+                transform: translateX(-52%) translateY(-5px);
+            }
+
+            100% {
+                transform: translateX(-52%) translateY(0px);
+            }
+        }
+
+        .login-container {
+            width: 400px;
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 35px;
+            border-radius: 20px; /* Tăng độ bo tròn từ 15px lên 20px */
+            box-shadow:
+                0 15px 30px rgba(0, 0, 0, 0.2),
+                0 5px 15px rgba(0, 0, 0, 0.05),
+                0 0 20px rgba(58, 123, 213, 0.2),
+                0 0 40px rgba(58, 123, 213, 0.1);
+            backdrop-filter: blur(5px);
+            animation: float-container 6s ease-in-out infinite;
+            z-index: 10;
+            transition: transform 0.8s ease, opacity 0.4s ease, box-shadow 0.3s ease, border-radius 0.3s ease;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .login-container:hover {
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 10px 20px rgba(0, 0, 0, 0.1),
+                0 0 30px rgba(58, 123, 213, 0.3),
+                0 0 60px rgba(58, 123, 213, 0.2);
+        }
+
+        @keyframes float-container {
+            0% {
+                transform: translateY(0px);
+                box-shadow:
+                    0 15px 30px rgba(0, 0, 0, 0.2),
+                    0 5px 15px rgba(0, 0, 0, 0.05),
+                    0 0 20px rgba(58, 123, 213, 0.2),
+                    0 0 40px rgba(58, 123, 213, 0.1);
+            }
+
+            50% {
+                transform: translateY(-15px);
+                box-shadow:
+                    0 25px 40px rgba(0, 0, 0, 0.15),
+                    0 10px 20px rgba(0, 0, 0, 0.1),
+                    0 0 30px rgba(58, 123, 213, 0.3),
+                    0 0 50px rgba(58, 123, 213, 0.2);
+            }
+
+            100% {
+                transform: translateY(0px);
+                box-shadow:
+                    0 15px 30px rgba(0, 0, 0, 0.2),
+                    0 5px 15px rgba(0, 0, 0, 0.05),
+                    0 0 20px rgba(58, 123, 213, 0.2),
+                    0 0 40px rgba(58, 123, 213, 0.1);
+            }
+        }
+
+        .login-container.rotate-out {
+            animation: none;
+            transform: rotateY(180deg);
+            opacity: 0;
+        }
+
+        .login-container.rotate-in {
+            animation: none;
+            transform: rotateY(-180deg);
+            opacity: 0;
+        }
+
+        @keyframes rotate-out {
+            0% {
+                transform: rotateY(0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: rotateY(180deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes rotate-in {
+            0% {
+                transform: rotateY(-180deg);
+                opacity: 0;
+            }
+
+            100% {
+                transform: rotateY(0);
+                opacity: 1;
+            }
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #3a7bd5;
+            font-size: 28px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #3a7bd5;
+            font-size: 16px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 14px 14px 40px;
+            border: 1px solid #bbd0ff;
+            border-radius: 30px;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .input-group input:focus {
+            border-color: #3a7bd5;
+            box-shadow: 0 0 5px rgba(58, 123, 213, 0.3);
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #3a7bd5;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #3a7bd5;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 18px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #2c5ba9;
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .options {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 15px;
+        }
+
+        .options a {
+            color: #3a7bd5;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .options a:hover {
+            color: #2c5ba9;
+            text-decoration: underline;
+        }
+
+        .social-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .social {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 35px;
+            height: 35px;
+            margin: 0 10px;
+            border-radius: 50%;
+            background-color: #3a7bd5;
+            color: #fff;
+            font-size: 18px;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+
+        .social:active {
+            transform: scale(0.95);
+        }
+
+        /* Enhanced Cloud animations */
+        .cloud {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            box-shadow: 0 8px 16px rgba(255, 255, 255, 0.3);
+            z-index: 1;
+        }
+
+        .cloud-1 {
+            width: 120px;
+            height: 60px;
+            top: 20%;
+            left: 10%;
+            animation: float-1 25s linear infinite;
+        }
+
+        .cloud-2 {
+            width: 150px;
+            height: 70px;
+            top: 30%;
+            left: 60%;
+            animation: float-2 22s linear infinite;
+        }
+
+        .cloud-3 {
+            width: 100px;
+            height: 50px;
+            top: 15%;
+            left: 30%;
+            animation: float-3 30s linear infinite;
+        }
+
+        .cloud-4 {
+            width: 130px;
+            height: 65px;
+            top: 60%;
+            left: 75%;
+            animation: float-4 35s linear infinite;
+        }
+
+        .cloud-5 {
+            width: 90px;
+            height: 45px;
+            top: 10%;
+            left: 5%;
+            animation: float-5 28s linear infinite;
+        }
+
+        .cloud-6 {
+            width: 110px;
+            height: 55px;
+            top: 50%;
+            left: 30%;
+            animation: float-6 32s linear infinite;
+        }
+
+        .cloud-7 {
+            width: 160px;
+            height: 80px;
+            top: 25%;
+            left: 80%;
+            animation: float-7 27s linear infinite;
+        }
+
+        .cloud-8 {
+            width: 140px;
+            height: 70px;
+            top: 70%;
+            left: 15%;
+            animation: float-8 29s linear infinite;
+        }
+
+        .cloud-9 {
+            width: 180px;
+            height: 90px;
+            top: 35%;
+            left: 45%;
+            animation: float-9 33s linear infinite;
+        }
+
+        .cloud-10 {
+            width: 130px;
+            height: 65px;
+            top: 55%;
+            left: 22%;
+            animation: float-10 36s linear infinite;
+        }
+
+        .cloud-11 {
+            width: 95px;
+            height: 48px;
+            top: 80%;
+            left: 55%;
+            animation: float-11 27s linear infinite;
+        }
+
+        .cloud-12 {
+            width: 110px;
+            height: 55px;
+            top: 5%;
+            left: 45%;
+            animation: float-12 31s linear infinite;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+        }
+
+        .cloud::before {
+            width: 60%;
+            height: 100%;
+            top: -50%;
+            left: 20%;
+        }
+
+        .cloud::after {
+            width: 50%;
+            height: 100%;
+            top: -30%;
+            right: 20%;
+        }
+
+        @keyframes float-1 {
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(200px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes float-2 {
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(-180px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes float-3 {
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(220px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes float-4 {
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(-150px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes float-5 {
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(170px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes float-6 {
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(-190px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes float-7 {
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(-210px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes float-8 {
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(160px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes float-9 {
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(-150px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes float-10 {
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(180px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes float-11 {
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(-120px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes float-12 {
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(130px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        /* Pug Animation Styles */
+        .pug-container {
+            width: 275px;
+            height: 200px;
+            margin: 0 auto 20px;
+            position: relative;
+            overflow: visible;
+        }
+
+        .ear {
+            position: absolute;
+            top: -30px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: #3a7bd5;
+        }
+
+        .ear.ear--left {
+            left: 50px;
+        }
+
+        .ear.ear--right {
+            right: 50px;
+        }
+
+        .face {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 200px;
+            height: 150px;
+            margin: 0 auto;
+            --rotate-head: 0deg;
+            transform: rotate(var(--rotate-head));
+            transition: transform 0.2s;
+            transform-origin: center 20px;
+        }
+
+        .eyes {
+            display: flex;
+            margin-top: 30px;
+        }
+
+        .eye {
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: #3a7bd5;
+        }
+
+        .eye.eye--left {
+            margin-right: 40px;
+        }
+
+        .eye.eye--right {
+            margin-left: 40px;
+        }
+
+        .eye .glow {
+            position: relative;
+            top: 3px;
+            right: -12px;
+            width: 12px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #fff;
+            transform: rotate(38deg);
+        }
+
+        .nose {
+            position: relative;
+            top: 30px;
+        }
+
+        .nose svg {
+            fill: #3a7bd5;
+        }
+
+        .nose .glow {
+            position: absolute;
+            top: 3px;
+            left: 32%;
+            width: 15px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #5080c5;
+        }
+
+        .mouth {
+            position: relative;
+            margin-top: 45px;
+        }
+
+        svg.smile {
+            position: absolute;
+            left: -28px;
+            top: -19px;
+            transform: scaleX(1.1);
+            stroke: #3a7bd5;
+        }
+
+        .mouth-hole {
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 60px;
+            height: 15px;
+            border-radius: 50%/100% 100% 0% 0;
+            transform: rotate(180deg);
+            background-color: #3a7bd5;
+            z-index: -1;
+        }
+
+        .tongue {
+            position: relative;
+            top: 5px;
+            width: 30px;
+            height: 20px;
+            background-color: #ffd7dd;
+            transform-origin: top;
+            transform: rotateX(60deg);
+        }
+
+        .tongue.breath {
+            animation: breath 0.3s infinite linear;
+        }
+
+        .tongue-top {
+            position: absolute;
+            bottom: -15px;
+            width: 30px;
+            height: 30px;
+            border-radius: 15px;
+            background-color: #ffd7dd;
+        }
+
+        .line {
+            position: absolute;
+            top: 0;
+            width: 30px;
+            height: 5px;
+            background-color: #fcb7bf;
+        }
+
+        .median {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 25px;
+            border-radius: 5px;
+            background-color: #fcb7bf;
+        }
+
+        .hands {
+            position: relative;
+            margin-top: 50px;
+        }
+
+        .hand {
+            position: absolute;
+            top: -6px;
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            z-index: 1;
+        }
+
+        .hand--left {
+            left: 50px;
+        }
+
+        .hand--left.hide {
+            transform: translate(2px, -155px) rotate(-160deg);
+        }
+
+        .hand--left.peek {
+            transform: translate(0px, -120px) rotate(-160deg);
+        }
+
+        .hand--right {
+            left: 170px;
+        }
+
+        .hand--right.hide {
+            transform: translate(-6px, -155px) rotate(160deg);
+        }
+
+        .hand--right.peek {
+            transform: translate(-4px, -120px) rotate(160deg);
+        }
+
+        .finger {
+            position: relative;
+            z-index: 0;
+        }
+
+        .bone {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #3a7bd5;
+            border-bottom: none;
+            border-top: none;
+            background-color: #a6c8ff;
+        }
+
+        .nail {
+            position: absolute;
+            left: 0;
+            top: 10px;
+            width: 20px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #3a7bd5;
+            background-color: #a6c8ff;
+            z-index: -1;
+        }
+
+        .finger:nth-child(1),
+        .finger:nth-child(3) {
+            left: 4px;
+            z-index: 1;
+        }
+
+        .finger:nth-child(1) .bone,
+        .finger:nth-child(3) .bone {
+            height: 10px;
+        }
+
+        .finger:nth-child(3) {
+            left: -4px;
+        }
+
+        .finger:nth-child(2) {
+            top: -5px;
+            z-index: 2;
+        }
+
+        .finger:nth-child(1) .nail,
+        .finger:nth-child(3) .nail {
+            top: 0px;
+        }
+
+        @keyframes breath {
+
+            0%,
+            100% {
+                transform: rotateX(0deg);
+            }
+
+            50% {
+                transform: rotateX(60deg);
+            }
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #3a7bd5;
+            font-size: 18px;
+        }
+
+        /* Thêm CSS cho phần Django messages */
+        .messages-container {
+            margin-bottom: 15px;
+        }
+
+        .text-danger {
+            color: #dc3545;
+            text-align: center;
+        }
+
+        /* Responsive design cho mobile */
+        @media screen and (max-width: 768px) {
+            body {
+                background-image: none;
+                background-color: #a6c8ff;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .login-container {
+                width: 90%;
+                max-width: 350px;
+                padding: 25px;
+                background-color: rgba(255, 255, 255, 0.85);
+                box-shadow: none;
+                animation: none;
+            }
+
+            .cloud {
+                display: none;
+            }
+
+            .welcome-text {
+                font-size: 2.2rem;
+                top: 2%;
+                opacity: 0.5;
+                filter: blur(2.5px);
+            }
+
+            .pug-container {
+                margin-bottom: 20px;
+                height: 180px;
+            }
+
+            .ear {
+                width: 60px;
+                height: 60px;
+            }
+
+            h2 {
+                font-size: 24px;
+                margin-bottom: 15px;
+            }
+
+            .input-group input {
+                padding: 12px 12px 12px 35px;
+                font-size: 14px;
+            }
+
+            .btn {
+                padding: 12px;
+                font-size: 16px;
+            }
+        }
+
+        /* Khi form đăng ký hiển thị, thay đổi welcome-text thành transparent hơn */
+        body.register-mode .welcome-text {
+            opacity: 0.4;
+            filter: blur(3px);
+            z-index: 1; /* Đảm bảo z-index thấp hơn */
+        }
+
+        /* Checkbox style */
+        .form-check-input {
+            width: auto !important;
+            margin-right: 10px;
+        }
+
+        .remember-me-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .custom-checkbox {
+            position: relative;
+            padding-left: 35px;
+            cursor: pointer;
+            font-size: 16px;
+            user-select: none;
+            color: #3a7bd5;
+            display: flex;
+            align-items: center;
+        }
+
+        .custom-checkbox input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .checkmark {
+            position: absolute;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background-color: #fff;
+            border: 1px solid #bbd0ff;
+            border-radius: 4px;
+        }
+
+        .custom-checkbox:hover input ~ .checkmark {
+            background-color: #f0f5ff;
+        }
+
+        .custom-checkbox input:checked ~ .checkmark {
+            background-color: #3a7bd5;
+            border-color: #3a7bd5;
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .custom-checkbox input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .custom-checkbox .checkmark:after {
+            left: 7px;
+            top: 3px;
+            width: 6px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        /* Style cho layout form đăng ký */
+        .row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .col {
+            flex: 1;
+            min-width: 0; /* Quan trọng để flex items không tràn ra ngoài */
+        }
+
+        .col .input-group {
+            margin-bottom: 10px; /* Giảm margin để layout nhỏ gọn hơn */
+        }
+
+        .col .input-group input {
+            width: 100%;
+            font-size: 15px; /* Giảm kích thước font chút xíu */
+        }
+
+        /* Style cho gender selection */
+        .gender-selection {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .gender-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .gender-radio {
+            position: relative;
+            display: inline-block;
+            margin-right: 10px;
+            height: 20px;
+            width: 20px;
+        }
+
+        .gender-radio input {
+            opacity: 0;
+            height: 0;
+            width: 0;
+        }
+
+        .radio-checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background-color: #fff;
+            border: 1px solid #bbd0ff;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .gender-radio:hover input ~ .radio-checkmark {
+            background-color: #f0f5ff;
+        }
+
+        .gender-radio input:checked ~ .radio-checkmark {
+            background-color: #3a7bd5;
+            border-color: #3a7bd5;
+        }
+
+        .radio-checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .gender-radio input:checked ~ .radio-checkmark:after {
+            display: block;
+        }
+
+        .gender-radio .radio-checkmark:after {
+            top: 6px;
+            left: 6px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .gender-label {
+            color: #3a7bd5;
+            font-size: 16px;
+        }
+
+        /* Modernize inputs */
+        .input-group input, .input-group select {
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            box-shadow: 0 3px 8px rgba(58, 123, 213, 0.15);
+            transform: translateY(-1px);
+        }
+
+        /* Động họa cho các nút */
+        .btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        .btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            20% {
+                transform: scale(25, 25);
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(40, 40);
+            }
+        }
+
+        /* Khi chuyển sang form đăng ký, tăng border-radius */
+        body.register-mode .login-container {
+            border-radius: 25px; /* Thêm bo tròn cho form đăng ký */
+        }
+
+        /* Làm đẹp hơn các input, button trong form đăng ký */
+        .input-group input,
+        .input-group select,
+        .btn {
+            border-radius: 15px; /* Tăng bo tròn cho input và button */
+            transition: all 0.3s ease;
+        }
+
+        /* CAPTCHA styles are now in captcha.html */
+
+        /* Overlay for login cooldown */
+        .login-cooldown-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-cooldown-timer {
+            font-size: 80px;
+            color: #ff3333;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+        }
+    </style>
+
+    <!-- Add Bootstrap JS for modal functionality -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <!-- Welcome text -->
+    <div class="welcome-text">Welcome to PTIT</div>
+
+    <!-- Decorative clouds -->
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="cloud cloud-4"></div>
+    <div class="cloud cloud-5"></div>
+    <div class="cloud cloud-6"></div>
+    <div class="cloud cloud-7"></div>
+    <div class="cloud cloud-8"></div>
+    <div class="cloud cloud-9"></div>
+    <div class="cloud cloud-10"></div>
+    <div class="cloud cloud-11"></div>
+    <div class="cloud cloud-12"></div>
+
+    <div class="login-container">
+        <!-- Pug Animation -->
+        <div class="pug-container">
+            <div class="ear ear--left"></div>
+            <div class="ear ear--right"></div>
+            <div class="face">
+                <div class="eyes">
+                    <div class="eye eye--left">
+                        <div class="glow"></div>
+                    </div>
+                    <div class="eye eye--right">
+                        <div class="glow"></div>
+                    </div>
+                </div>
+                <div class="nose">
+                    <svg width="38.161" height="22.03">
+                        <path
+                            d="M2.017 10.987Q-.563 7.513.157 4.754C.877 1.994 2.976.135 6.164.093 16.4-.04 22.293-.022 32.048.093c3.501.042 5.48 2.081 6.02 4.661q.54 2.579-2.051 6.233-8.612 10.979-16.664 11.043-8.053.063-17.336-11.043z">
+                        </path>
+                    </svg>
+                    <div class="glow"></div>
+                </div>
+                <div class="mouth">
+                    <svg class="smile" viewBox="-2 -2 84 23" width="84" height="23">
+                        <path
+                            d="M0 0c3.76 9.279 9.69 18.98 26.712 19.238 17.022.258 10.72.258 28 0S75.959 9.182 79.987.161"
+                            fill="none" stroke-width="3" stroke-linecap="square" stroke-miterlimit="3"></path>
+                    </svg>
+                    <div class="mouth-hole"></div>
+                    <div class="tongue breath">
+                        <div class="tongue-top"></div>
+                        <div class="line"></div>
+                        <div class="median"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="hands">
+                <div class="hand hand--left">
+                    <div class="finger">
+                        <div class="bone"></div>
+                        <div class="nail"></div>
+                    </div>
+                    <div class="finger">
+                        <div class="bone"></div>
+                        <div class="nail"></div>
+                    </div>
+                    <div class="finger">
+                        <div class="bone"></div>
+                        <div class="nail"></div>
+                    </div>
+                </div>
+                <div class="hand hand--right">
+                    <div class="finger">
+                        <div class="bone"></div>
+                        <div class="nail"></div>
+                    </div>
+                    <div class="finger">
+                        <div class="bone"></div>
+                        <div class="nail"></div>
+                    </div>
+                    <div class="finger">
+                        <div class="bone"></div>
+                        <div class="nail"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2>Đăng Nhập</h2>
+
+        <!-- Display Django messages -->
+        <div class="messages-container">
+            {% for message in messages %}
+            <h5 class="text-danger">{{message}}</h5>
+            {% endfor %}
+        </div>
+
+        <!-- Login Form - Keep Django form elements -->
+        <form method="POST" action="" id="login-form"> <!-- Added ID -->
+            {% csrf_token %}
+            <div class="input-group">
+                <i class='bx bxs-user'></i>
+                <input type="text" id="username" name="username" placeholder="Tên đăng nhập" required>
+            </div>
+            <div class="input-group password-wrapper">
+                <i class='bx bxs-lock-alt'></i>
+                <input type="password" id="password" name="password" placeholder="Mật khẩu" required>
+                <button type="button" class="password-button" onclick="togglePassword()">
+                    <i class='bx bx-show'></i>
+                </button>
+            </div>
+            <!-- Thay thế phần input checkbox cũ -->
+            <div class="input-group remember-me-container">
+                <label class="custom-checkbox">
+                    Ghi nhớ đăng nhập
+                    <input type="checkbox" id="exampleCheck1" name="remember_me">
+                    <span class="checkmark"></span>
+                </label>
+            </div>
+            <button type="submit" class="btn">Đăng Nhập</button>
+            <div class="options">
+                <a href="{% url 'reset_password' %}">Quên mật khẩu?</a>
+                <a href="#" id="register-link">Đăng ký</a>
+            </div>
+        </form>
+
+        <div class="social-buttons">
+            <div class="social">
+                <i class='bx bxl-facebook'></i>
+            </div>
+            <div class="social">
+                <i class='bx bxl-google'></i>
+            </div>
+            <div class="social">
+                <i class='bx bxl-github'></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include the CAPTCHA modal -->
+    {% include "captcha_modal.html" %}
+
+    <!-- Login cooldown overlay -->
+    <div class="login-cooldown-overlay" id="login-cooldown-overlay">
+        <div class="login-cooldown-timer" id="login-cooldown-timer">15</div>
+    </div>
+
+    <script>
+    // Password visibility toggle
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        // Ensure the button selector is specific enough if multiple password fields exist
+        const passwordButton = document.querySelector('#login-form .password-button i');
+
+        if (passwordInput && passwordButton) {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordButton.className = 'bx bx-hide';
+            } else {
+                passwordInput.type = 'password';
+                passwordButton.className = 'bx bx-show';
+            }
+        }
+    }
+
+    // Toggle password for register form (if it appears dynamically)
+    function togglePasswordRegister(inputId) {
+        const passwordInput = document.getElementById(inputId);
+        if (!passwordInput) return;
+        const passwordButton = passwordInput.nextElementSibling.querySelector('i');
+
+        if (passwordButton) {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordButton.className = 'bx bx-hide';
+            } else {
+                passwordInput.type = 'password';
+                passwordButton.className = 'bx bx-show';
+            }
+        }
+    }
+
+    // Form rotation and content switching
+    document.addEventListener('DOMContentLoaded', function () {
+        const passwordInput = document.getElementById('password');
+        const leftHand = document.querySelector('.hand--left');
+        const rightHand = document.querySelector('.hand--right');
+
+        // Hand animation for password field
+        if (passwordInput && leftHand && rightHand) {
+            passwordInput.addEventListener('focus', function () {
+                leftHand.classList.add('hide');
+                rightHand.classList.add('hide');
+            });
+
+            passwordInput.addEventListener('blur', function () {
+                leftHand.classList.remove('hide');
+                rightHand.classList.remove('hide');
+            });
+        }
+
+        // Lưu nội dung ban đầu của form đăng nhập
+        const loginContainer = document.querySelector('.login-container');
+        const loginContent = loginContainer.innerHTML; // Capture initial state
+
+        // Tạo nội dung form đăng ký (Keep this logic as it modifies the container)
+        const registerContent = `
+            <h2>Đăng Ký</h2>
+            <form action="{% url 'register' %}" method="post" id="register-form">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col">
+                        <div class="input-group">
+                            <i class='bx bxs-user'></i>
+                            <input type="text" id="first_name" name="first_name" placeholder="Họ" required>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="input-group">
+                            <i class='bx bxs-user'></i>
+                            <input type="text" id="last_name" name="last_name" placeholder="Tên" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="input-group">
+                            <i class='bx bxs-id-card'></i>
+                            <input type="text" id="studen_id" name="studen_id" placeholder="Mã sinh viên" required>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="input-group">
+                            <i class='bx bxs-graduation'></i>
+                            <input type="text" id="user_class" name="user_class" placeholder="Lớp" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="gender-selection">
+                    <label class="gender-option">
+                        <span class="gender-radio">
+                            <input type="radio" name="gender" value="male" checked>
+                            <span class="radio-checkmark"></span>
+                        </span>
+                        <span class="gender-label">Nam</span>
+                    </label>
+                    <label class="gender-option">
+                        <span class="gender-radio">
+                            <input type="radio" name="gender" value="female">
+                            <span class="radio-checkmark"></span>
+                        </span>
+                        <span class="gender-label">Nữ</span>
+                    </label>
+                    <label class="gender-option">
+                        <span class="gender-radio">
+                            <input type="radio" name="gender" value="other">
+                            <span class="radio-checkmark"></span>
+                        </span>
+                        <span class="gender-label">Khác</span>
+                    </label>
+                </div>
+                <div class="input-group">
+                    <i class='bx bxs-envelope'></i>
+                    <input type="email" id="email" name="email" placeholder="Email" required>
+                </div>
+                <div class="input-group">
+                    <i class='bx bxs-user'></i>
+                    <input type="text" id="username" name="username" placeholder="Tên đăng nhập" required>
+                </div>
+                <div class="input-group password-wrapper">
+                    <i class='bx bxs-lock-alt'></i>
+                    <input type="password" id="register-password" name="password" placeholder="Mật khẩu" required>
+                    <button type="button" class="password-button" onclick="togglePasswordRegister('register-password')">
+                        <i class='bx bx-show'></i>
+                    </button>
+                </div>
+                <div class="input-group password-wrapper">
+                    <i class='bx bxs-lock-alt'></i>
+                    <input type="password" id="confirm-password" name="password2" placeholder="Xác nhận mật khẩu" required>
+                    <button type="button" class="password-button" onclick="togglePasswordRegister('confirm-password')">
+                        <i class='bx bx-show'></i>
+                    </button>
+                </div>
+                <div class="input-group remember-me-container">
+                    <label class="custom-checkbox">
+                        Tôi đồng ý với Điều khoản và Điều kiện
+                        <input type="checkbox" id="termsCheck" required>
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+                <button type="submit" class="btn">Đăng Ký</button>
+                <div class="options">
+                    <a href="#" id="back-to-login">Đã có tài khoản? Đăng nhập ngay</a>
+                </div>
+            </form>
+        `;
+
+        // Xử lý hiệu ứng quay form khi chuyển đến đăng ký
+        const registerLink = document.getElementById('register-link');
+
+        if (registerLink) {
+            registerLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                loginContainer.classList.add('rotate-out');
+                setTimeout(() => {
+                    loginContainer.innerHTML = registerContent;
+                    setupRegisterBackButton(); // Setup back button for the new content
+                    setupRegisterForm(); // Add this to set up CAPTCHA for register form
+                    loginContainer.classList.remove('rotate-out');
+                    loginContainer.classList.add('rotate-in');
+                    loginContainer.style.width = '480px';
+                    document.body.classList.add('register-mode');
+                }, 400);
+                setTimeout(() => {
+                    loginContainer.classList.remove('rotate-in');
+                }, 800);
+            });
+        }
+
+        // Hàm thiết lập sự kiện cho nút quay lại
+        function setupRegisterBackButton() {
+            const backToLoginButton = document.getElementById('back-to-login');
+            if (backToLoginButton) {
+                backToLoginButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    loginContainer.classList.add('rotate-out');
+                    setTimeout(() => {
+                        loginContainer.innerHTML = loginContent; // Restore original content
+                        loginContainer.classList.remove('rotate-out');
+                        loginContainer.classList.add('rotate-in');
+                        loginContainer.style.width = '400px';
+                        document.body.classList.remove('register-mode');
+                        setupLoginEvents(); // Re-setup events for original content
+                    }, 400);
+                    setTimeout(() => {
+                        loginContainer.classList.remove('rotate-in');
+                    }, 800);
+                });
+            }
+        }
+
+        // Hàm thiết lập lại sự kiện cho form đăng nhập (original content)
+        function setupLoginEvents() {
+            // Re-bind password peek animation
+            const newPasswordInput = document.getElementById('password');
+            const newLeftHand = document.querySelector('.hand--left');
+            const newRightHand = document.querySelector('.hand--right');
+            if (newPasswordInput && newLeftHand && newRightHand) {
+                newPasswordInput.addEventListener('focus', function() {
+                    newLeftHand.classList.add('hide');
+                    newRightHand.classList.add('hide');
+                });
+                newPasswordInput.addEventListener('blur', function() {
+                    newLeftHand.classList.remove('hide');
+                    newRightHand.classList.remove('hide');
+                });
+            }
+
+            // Re-bind register link click
+            const newRegisterLink = document.getElementById('register-link');
+            if (newRegisterLink) {
+                 newRegisterLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    loginContainer.classList.add('rotate-out');
+                    setTimeout(() => {
+                        loginContainer.innerHTML = registerContent;
+                        setupRegisterBackButton();
+                        setupRegisterForm(); // Add this to set up CAPTCHA for register form
+                        loginContainer.classList.remove('rotate-out');
+                        loginContainer.classList.add('rotate-in');
+                        loginContainer.style.width = '480px';
+                        document.body.classList.add('register-mode');
+                    }, 400);
+                    setTimeout(() => {
+                        loginContainer.classList.remove('rotate-in');
+                    }, 800);
+                });
+            }
+
+            // Re-bind password toggle button
+            const pwdButton = document.querySelector('#login-form .password-button');
+             if (pwdButton) {
+                pwdButton.addEventListener('click', togglePassword);
+             }
+
+            // Re-bind CAPTCHA for login form
+            const newLoginForm = document.getElementById('login-form');
+            if (newLoginForm) {
+                newLoginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const captchaModal = new bootstrap.Modal(document.getElementById('captchaModal'));
+                    captchaModal.show();
+                    
+                    // Set the form as the active form for submission after CAPTCHA
+                    document.getElementById('captchaModal').setAttribute('data-form-id', 'login-form');
+                });
+            }
+
+            // Check for login failures when login form is restored
+            if (checkForLoginFailure()) {
+                startLoginCooldown();
+            }
+        }
+
+        // CAPTCHA handling for login form
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const captchaModal = new bootstrap.Modal(document.getElementById('captchaModal'));
+                captchaModal.show();
+                
+                // Set the form as the active form for submission after CAPTCHA
+                document.getElementById('captchaModal').setAttribute('data-form-id', 'login-form');
+            });
+        }
+        
+        // CAPTCHA functions
+        function loadCaptchaImage() {
+            // Add timestamp to prevent cache
+            document.getElementById('captcha-image').src = '/captcha-image/?' + new Date().getTime();
+            document.getElementById('captcha-input').value = '';
+            document.getElementById('captcha-error').style.display = 'none';
+        }
+        
+        // Refresh CAPTCHA button
+        document.getElementById('refresh-captcha').addEventListener('click', loadCaptchaImage);
+        
+        // CAPTCHA submit button
+        document.getElementById('captcha-submit').addEventListener('click', function() {
+            const captchaInput = document.getElementById('captcha-input').value.trim();
+            if (!captchaInput) {
+                document.getElementById('captcha-error').textContent = 'Vui lòng nhập mã CAPTCHA.';
+                document.getElementById('captcha-error').style.display = 'block';
+                return;
+            }
+            
+            // Send CAPTCHA verification request
+            fetch('/verify-captcha/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ captcha: captchaInput })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // CAPTCHA is correct, submit the form
+                    const formId = document.getElementById('captchaModal').getAttribute('data-form-id');
+                    const form = document.getElementById(formId);
+                    
+                    // Hide the modal
+                    bootstrap.Modal.getInstance(document.getElementById('captchaModal')).hide();
+                    
+                    // Submit the form
+                    if (form) {
+                        form.submit();
+                    }
+                } else {
+                    // CAPTCHA is incorrect
+                    document.getElementById('captcha-error').textContent = 'Mã CAPTCHA không chính xác. Vui lòng thử lại.';
+                    document.getElementById('captcha-error').style.display = 'block';
+                    loadCaptchaImage(); // Reload CAPTCHA
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('captcha-error').textContent = 'Đã xảy ra lỗi. Vui lòng thử lại.';
+                document.getElementById('captcha-error').style.display = 'block';
+            });
+        });
+        
+        // Helper function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        // Modify the register form to use CAPTCHA as well
+        function setupRegisterForm() {
+            const registerForm = document.getElementById('register-form');
+            if (registerForm) {
+                registerForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const captchaModal = new bootstrap.Modal(document.getElementById('captchaModal'));
+                    captchaModal.show();
+                    
+                    // Load a fresh CAPTCHA when modal is shown
+                    loadCaptchaImage();
+                    
+                    // Set the form as the active form for submission after CAPTCHA
+                    document.getElementById('captchaModal').setAttribute('data-form-id', 'register-form');
+                });
+            }
+        }
+
+        // Initial setup for password toggle if needed
+        const initialPwdButton = document.querySelector('#login-form .password-button');
+        if (initialPwdButton) {
+            initialPwdButton.addEventListener('click', togglePassword);
+        }
+
+        // Add cooldown detection and handling
+        const overlay = document.getElementById('login-cooldown-overlay');
+        const cooldownTimer = document.getElementById('login-cooldown-timer');
+        let cooldownInterval = null;
+
+        // Function to check for error messages that indicate login failure
+        function checkForLoginFailure() {
+            const errorMessages = document.querySelectorAll('.text-danger');
+            return errorMessages.length > 0 && errorMessages[0].textContent.includes('Credentials Invalid');
+        }
+
+        // Function to start cooldown
+        function startLoginCooldown() {
+            // Show overlay
+            overlay.style.display = 'flex';
+
+            // Set initial countdown value
+            let secondsLeft = 15;
+            cooldownTimer.textContent = secondsLeft;
+
+            // Clear any existing interval
+            if (cooldownInterval) {
+                clearInterval(cooldownInterval);
+            }
+
+            // Start countdown
+            cooldownInterval = setInterval(function() {
+                secondsLeft--;
+                cooldownTimer.textContent = secondsLeft;
+
+                if (secondsLeft <= 0) {
+                    // End cooldown when timer reaches zero
+                    clearInterval(cooldownInterval);
+                    overlay.style.display = 'none';
+                }
+            }, 1000);
+        }
+
+        // Check for login failures when page loads
+        if (checkForLoginFailure()) {
+            startLoginCooldown();
+        }
+    });
+    </script>
+</body>
+
+</html>

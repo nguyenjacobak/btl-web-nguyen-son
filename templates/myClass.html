@@ -1,0 +1,557 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Classes</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+    <link rel="stylesheet" href="/static/cssQuan/icon_all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-image: url('/static/images/Ptit.jpg'); /* Thay đổi thành nền giống home */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* Lớp overlay làm tối ảnh nền */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 20, 0.7); /* Lớp lọc màu tối đậm hơn */
+            backdrop-filter: blur(5px); /* Tăng độ mờ nền */
+            -webkit-backdrop-filter: blur(5px);
+            z-index: -1;
+        }
+
+        /* Container with glassmorphism effect */
+        .container {
+            background-color: rgba(255, 255, 255, 0.85);
+            border-radius: 20px; /* Tăng bo tròn */
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 30px;
+            margin-top: 80px;
+            margin-bottom: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Clouds for background */
+        .cloud {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1);
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        .cloud-1 {
+            width: 120px;
+            height: 60px;
+            top: 20%;
+            left: 10%;
+            animation: float-1 25s linear infinite;
+        }
+
+        .cloud-2 {
+            width: 150px;
+            height: 70px;
+            top: 30%;
+            left: 60%;
+            animation: float-2 22s linear infinite;
+        }
+
+        .cloud-3 {
+            width: 100px;
+            height: 50px;
+            top: 15%;
+            left: 30%;
+            animation: float-3 30s linear infinite;
+        }
+
+        .cloud-4 {
+            width: 130px;
+            height: 65px;
+            top: 60%;
+            left: 75%;
+            animation: float-4 35s linear infinite;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+        }
+
+        .cloud::before {
+            width: 60%;
+            height: 100%;
+            top: -50%;
+            left: 20%;
+        }
+
+        .cloud::after {
+            width: 50%;
+            height: 100%;
+            top: -30%;
+            right: 20%;
+        }
+
+        @keyframes float-1 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(100px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes float-2 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-80px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes float-3 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(120px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes float-4 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-90px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Improve card design */
+        .card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #3a7bd5;
+            margin-bottom: 15px;
+        }
+
+        .card-text {
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .card .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .card .delete-btn:hover {
+            background-color: #f8d7da;
+        }
+
+        /* Improve buttons */
+        .btn {
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background-color: #3a7bd5;
+            border-color: #3a7bd5;
+        }
+
+        .btn-primary:hover {
+            background-color: #2a6ac5;
+            border-color: #2a6ac5;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(58, 123, 213, 0.3);
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        /* Modal improvements */
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eaeaea;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .modal-title {
+            color: #3a7bd5;
+            font-weight: 700;
+        }
+
+        .custom-alert {
+            max-width: 600px;
+            margin: 0 auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        #notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transform: translateX(200%);
+            transition: transform 0.5s ease-out;
+        }
+
+        #notification.show {
+            transform: translateX(0);
+        }
+        
+        /* Page title styling */
+        h1 {
+            color: #3a7bd5;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #3a7bd5, transparent);
+            border-radius: 3px;
+        }
+
+        /* Simple transition for page */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="fade-in">
+    <!-- Decorative clouds -->
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="cloud cloud-4"></div>
+
+    <!-- Page transition element -->
+    <div class="page-transition"></div>
+
+    <!-- Include the newmenu component -->
+    {% include "Components/newmenu.html" %}
+    
+    <div id="notification" style="display: none;">
+        Lớp học đã được xóa thành công.
+    </div>
+    
+    <div class="container mt-4">
+        <!-- Messages -->
+        {% if messages %}
+            <div class="alert-container">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %} alert-info{% endif %}" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Lớp học của tôi</h1>
+            <div>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#joinClassModal">
+                    <i class="fas fa-sign-in-alt me-2"></i>Tham gia lớp học
+                </button>
+                {% if user.is_staff %}
+                    <button type="button" class="btn btn-success ms-2" data-bs-toggle="modal" data-bs-target="#createClassModal">
+                        <i class="fas fa-plus me-2"></i>Tạo lớp học
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+
+        <hr>
+
+        {% if classes %}
+            <div class="row">
+                {% for class in classes %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">{{ class.name }}
+                                    {% if user == class.instructor %}
+                                        <button type="button" class="btn btn-danger btn-sm delete-btn" onclick="deleteClass({{ class.id }})">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    {% endif %}
+                                </h5>
+                                <p class="card-text">Giảng viên: {{ class.instructor.username }}</p>
+                                <a href="{% url 'class_detail' class.id %}" class="btn btn-primary mt-auto view-class-btn">Xem lớp học</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            {% if not messages %}
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>Chưa có lớp học nào được tìm thấy.
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+    
+    <!-- Join Class Modal -->
+    <div class="modal fade" id="joinClassModal" tabindex="-1" aria-labelledby="joinClassModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="joinClassModalLabel">Tham gia lớp học</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'request_class' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="classCode" class="form-label">Mã lớp học</label>
+                            <input type="text" class="form-control" id="classCode" name="code" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Tham gia</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Class Modal -->
+    <div class="modal fade" id="createClassModal" tabindex="-1" aria-labelledby="createClassModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createClassModalLabel">Tạo lớp học mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'create_class' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="className" class="form-label">Tên lớp học</label>
+                            <input type="text" class="form-control" id="className" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="classCode" class="form-label">Mã lớp học</label>
+                            <input type="text" class="form-control" id="classCode" name="code" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">Tạo lớp học</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include the chat bubble component -->
+    {% include "Components/chat_bubble.html" %}
+
+    <script src="/static/cssQuan/bootstrap.bundle.min.js"></script>
+    <script>
+        // Tự động ẩn các thông báo sau 5 giây
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert:not(.persistent-alert)');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+
+        // Xử lý xóa lớp học
+        function deleteClass(classId) {
+            const classCode = prompt('Vui lòng nhập mã lớp học để xác nhận xóa:');
+            if (classCode) {
+                fetch("{% url 'delete_class' 0 %}".replace('0', classId), {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ class_code: classCode })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        const notification = document.getElementById('notification');
+                        notification.style.display = 'block';
+                        notification.classList.add('show');
+                        setTimeout(() => {
+                            notification.classList.remove('show');
+                            setTimeout(() => {
+                                notification.style.display = 'none';
+                                location.reload(); // Tải lại trang sau khi xóa thành công
+                            }, 500);
+                        }, 3000);
+                    } else {
+                        alert('Không thể xóa lớp học. Vui lòng kiểm tra mã lớp học và thử lại.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Đã xảy ra lỗi. Vui lòng thử lại.');
+                });
+            }
+        }
+
+        // Cải thiện hiệu ứng chuyển trang
+        document.addEventListener('DOMContentLoaded', function() {
+            const transitionElement = document.querySelector('.page-transition');
+            
+            // Kiểm tra xem có đang trong trạng thái quá trình chuyển trang không
+            const isInTransition = sessionStorage.getItem('pageTransition');
+            
+            if (isInTransition === 'true') {
+                // Nếu đang chuyển trang, xóa trạng thái và đảm bảo transition element không hiển thị
+                sessionStorage.removeItem('pageTransition');
+                transitionElement.classList.remove('active');
+            }
+            
+            // Xử lý menu links
+            const menuLinks = document.querySelectorAll('.nav-menu a');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Skip transition for logout button
+                    if (this.classList.contains('logout-btn')) return;
+                    
+                    e.preventDefault();
+                    const destination = this.getAttribute('href');
+                    
+                    // Set the origin point for the transition circle
+                    const rect = this.getBoundingClientRect();
+                    const x = (rect.left + rect.right) / 2;
+                    const y = (rect.top + rect.bottom) / 2;
+                    
+                    transitionElement.style.setProperty('--x', `${x}px`);
+                    transitionElement.style.setProperty('--y', `${y}px`);
+                    
+                    // Đánh dấu đang trong quá trình chuyển trang
+                    sessionStorage.setItem('pageTransition', 'true');
+                    
+                    // Trigger the transition
+                    transitionElement.classList.add('active');
+                    
+                    // Đảm bảo chuyển trang sau hiệu ứng
+                    setTimeout(() => {
+                        window.location.href = destination;
+                    }, 700);
+                });
+            });
+            
+            // Xử lý nút "View Class" 
+            const viewClassButtons = document.querySelectorAll('.view-class-btn');
+            viewClassButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation(); // Ngăn sự kiện lan tỏa
+                    const destination = this.getAttribute('href');
+                    
+                    // Set the origin point for the transition circle
+                    const rect = this.getBoundingClientRect();
+                    const x = (rect.left + rect.right) / 2;
+                    const y = (rect.top + rect.bottom) / 2;
+                    
+                    transitionElement.style.setProperty('--x', `${x}px`);
+                    transitionElement.style.setProperty('--y', `${y}px`);
+                    
+                    // Đánh dấu đang trong quá trình chuyển trang
+                    sessionStorage.setItem('pageTransition', 'true');
+                    
+                    // Trigger the transition
+                    transitionElement.classList.add('active');
+                    
+                    // Đảm bảo chuyển trang sau hiệu ứng
+                    setTimeout(() => {
+                        window.location.href = destination;
+                    }, 700);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ submission.quiz.title }} - Chấm điểm</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .pdf-viewer {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .pdf-viewer iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .grading-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .btn-submit {
+            background: #3a7bd5;
+            color: #fff;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-submit:hover {
+            background: #2d62c0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .btn-back {
+            background: #6c757d;
+            color: #fff;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-back:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .student-info {
+            padding: 15px;
+            border-radius: 10px;
+            background: #e9f2fd;
+            margin-bottom: 20px;
+        }
+        .page-title {
+            text-align: center;
+            color: #3a7bd5;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+<body>
+    {% include "Components/newmenu.html" %}
+    
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <h1 class="page-title">{{ submission.quiz.title }}</h1>
+        
+        <div class="student-info">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Họ tên:</strong> {{ submission.user.profile.full_name }}</p>
+                    <p><strong>Mã sinh viên:</strong> {{ submission.user.profile.studen_id }}</p>
+                    <p><strong>Thời gian nộp bài:</strong> {{ submission.submission_date }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="pdf-viewer">
+            <iframe src="/static/pdfjs/web/viewer.html?file={{ submission.submission_file.url|urlencode }}"></iframe>
+        </div>
+        
+        <div class="grading-section">
+            <h3 class="mb-4">Chấm điểm</h3>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="score" class="form-label">Điểm số (0-10)</label>
+                    <input type="number" class="form-control" id="score" name="score" min="0" max="10" step="0.1" required>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'mark_quiz' submission.quiz.id %}" class="btn btn-back">
+                        <i class="fas fa-arrow-left mr-2"></i> Quay lại
+                    </a>
+                    <button type="submit" class="btn btn-submit">
+                        <i class="fas fa-check mr-2"></i> Lưu điểm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="/static/cssQuan/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

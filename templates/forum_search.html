@@ -1,0 +1,126 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kết quả tìm kiếm</title>
+  <link rel="stylesheet" href="{% static 'cssQuan/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="shortcut icon" href="/static/images/favicon.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      background-image: url('/static/images/Ptit.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      font-family: 'Arial', sans-serif;
+      color: #333;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 20, 0.7);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 30px;
+      margin-top: 80px;
+      margin-bottom: 50px;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .jumbotron {
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .list-group-item {
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 15px;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .list-group-item:hover {
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #3a7bd5, #2a6ac5);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 30px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      box-shadow: 0 5px 15px rgba(58, 123, 213, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .btn-success:hover {
+      background: linear-gradient(135deg, #2a6ac5, #1a5ab5);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(58, 123, 213, 0.4);
+    }
+  </style>
+</head>
+
+<body>
+  {% include "Components/newmenu.html" %}
+
+  <div class="container my-5">
+    <div class="jumbotron p-4">
+      <h1 class="text-center my-5">Kết quả tìm kiếm</h1>
+      {% if query %}
+        <p>Kết quả cho "{{ query }}":</p>
+        <ul class="list-group">
+          {% for forum in results %}
+            <a href="{% url 'forum-detail' forum.slug %}" class="list-group-item list-group-item-action mb-2">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ forum.title }}</h5>
+                <small class="text-muted">{{ forum.created_at|naturaltime }}</small>
+              </div>
+            </a>
+          {% endfor %}
+        </ul>
+        {% include 'pagination_search.html' with page_obj=results query=query %}
+        <a href="{% url 'forum-list' %}" class="btn btn-success mt-3">Quay lại danh sách diễn đàn</a>
+      {% else %}
+        <p>Không tìm thấy kết quả nào.</p>
+        <a href="{% url 'forum-list' %}" class="btn btn-success mt-3">Quay lại danh sách diễn đàn</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <script src="{% static 'cssQuan/bootstrap.bundle.min.js' %}"></script>
+  {% include "Components/chat_bubble.html" %}
+</body>
+
+</html>

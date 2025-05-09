@@ -1,0 +1,731 @@
+<div class="assistant-container">
+    <div class="assistant-character" onclick="toggleChatbot()">
+        <div class="head">
+            <div class="face">
+                <div class="eyes">
+                    <div class="eye left"></div>
+                    <div class="eye right"></div>
+                </div>
+                <div class="mouth"></div>
+            </div>
+            <div class="hair"></div>
+        </div>
+        <div class="body">
+            <div class="torso"></div>
+            <div class="arm left"></div>
+            <div class="arm right"></div>
+        </div>
+    </div>
+    
+    <div class="speech-bubble" id="greeting-bubble">
+        <p>Xin chào, tôi có thể giúp gì cho bạn?</p>
+    </div>
+</div>
+
+<div id="chatbot-container" class="chatbot-container">
+    <div class="chat-header">
+        <h5>Trợ lý học tập</h5>
+        <div class="header-actions">
+            <button class="clear-btn" onclick="clearChatHistory()">Xóa</button>
+            <button class="close-btn" onclick="toggleChatbot()">✕</button>
+        </div>
+    </div>
+    <div class="chat-body">
+        <div id="chatHistory" class="chat-history"></div>
+        <div id="typingIndicator" class="typing-indicator" style="display: none;">đang nhập...</div>
+        <div class="form-group chat-input-container">
+            <input type="text" class="form-control chat-input" id="userInput" placeholder="Nhập câu hỏi của bạn..." onkeypress="if(event.keyCode === 13) sendMessage()">
+            <button class="btn btn-send" id="sendButton" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Import GitHub Markdown CSS for better markdown styling */
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css');
+
+    /* Nhân vật trợ lý */
+    .assistant-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 100px;
+        height: 140px;
+        z-index: 1000;
+        cursor: pointer;
+    }
+    
+    .assistant-character {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform-origin: bottom center;
+        animation: bounce 3s ease-in-out infinite;
+    }
+    
+    /* Đầu nhân vật */
+    .head {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        background: #FFD3B5;
+        border-radius: 50%;
+        top: 0;
+        left: 20px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        animation: headTilt 8s ease-in-out infinite;
+    }
+    
+    .face {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .eyes {
+        position: absolute;
+        top: 25px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .eye {
+        width: 8px;
+        height: 12px;
+        background: #333;
+        border-radius: 50%;
+        margin: 0 8px;
+        animation: blink 4s ease-in-out infinite;
+    }
+    
+    .mouth {
+        position: absolute;
+        width: 20px;
+        height: 10px;
+        background: #FF6B6B;
+        border-radius: 0 0 10px 10px;
+        bottom: 8px; /* Thay đổi từ 15px xuống 13px */
+        left: 20px;
+        animation: smile 8s ease-in-out infinite;
+    }
+    
+    .hair {
+        position: absolute;
+        top: -5px;
+        left: 0;
+        width: 100%;
+        height: 20px;
+        background: #663300;
+        border-radius: 50% 50% 0 0;
+    }
+    
+    /* Thân nhân vật */
+    .body {
+        position: absolute;
+        width: 100%;
+        top: 60px;
+    }
+    
+    .torso {
+        width: 50px;
+        height: 60px;
+        background: #3a7bd5;
+        border-radius: 15px 15px 0 0;
+        left: 25px;
+        position: absolute;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .arm {
+        width: 15px;
+        height: 50px;
+        background: #3a7bd5;
+        position: absolute;
+        top: 5px;
+        border-radius: 8px;
+    }
+    
+    .arm.left {
+        left: 10px;
+        transform-origin: top center;
+        animation: waveLeft 5s ease-in-out infinite;
+    }
+    
+    .arm.right {
+        right: 10px;
+        transform-origin: top center;
+        animation: waveRight 6s ease-in-out infinite;
+    }
+    
+    /* Speech bubble - vị trí bên trái */
+    .speech-bubble {
+        position: absolute;
+        width: 180px;
+        background: white;
+        border-radius: 15px;
+        padding: 10px;
+        top: 0; /* Giữ nguyên vị trí ngang với đầu */
+        left: -200px; /* Di chuyển sang bên trái */
+        bottom: auto;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        transform: translateY(20px);
+        animation: showMessage 10s ease-in-out infinite;
+    }
+    
+    /* Điều chỉnh mũi tên sang phải */
+    .speech-bubble::after {
+        content: '';
+        position: absolute;
+        right: -10px; /* Mũi tên ở bên phải */
+        top: 20px; /* Giữ nguyên vị trí ở giữa về chiều cao */
+        border-width: 10px 0 10px 10px; /* Đổi hướng mũi tên sang phải */
+        border-style: solid;
+        border-color: transparent transparent transparent white; /* Đổi màu biên */
+    }
+    
+    .speech-bubble p {
+        margin: 0;
+        font-size: 14px;
+        color: #333;
+    }
+    
+    /* Chatbot container */
+    .chatbot-container {
+        position: fixed;
+        bottom: 20px;
+        right: 130px;
+        width: 50vw;
+        height: 80vh;
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+        display: none;
+        flex-direction: column;
+        z-index: 1000;
+        overflow: hidden;
+        animation: slideIn 0.3s ease-in-out;
+    }
+    
+    .chat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #3a7bd5, #2a6ac5);
+        color: #fff;
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .chat-header h5 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+    }
+    
+    .header-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .clear-btn {
+        background: #e74c3c;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        padding: 5px 10px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+    
+    .clear-btn:hover {
+        background: #c0392b;
+    }
+    
+    .chat-header button {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        border-radius: 5px;
+        padding: 5px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .chat-header button:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .close-btn {
+        margin-left: 5px;
+        border-radius: 50% !important;
+        width: 25px;
+        height: 25px;
+        padding: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .chat-body {
+        padding: 15px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        background-color: #f8f9fa;
+        min-height: 0; /* allow children to shrink */
+    }
+    
+    .chat-history {
+        flex: 1 1 auto;           /* allow filling space */
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        min-height: 0; /* prevent it from exceeding parent */
+        margin: 0;
+        padding: 10px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .chat-message {
+        margin-bottom: 12px;
+        padding: 10px;
+        border-radius: 10px;
+        max-width: 80%;
+        position: relative;
+        line-height: 1.4;
+        white-space: pre-wrap; /* preserve line breaks and spacing */
+    }
+    
+    .chat-message.user {
+        background-color: #e3f2fd;
+        align-self: flex-end;
+        margin-left: auto;
+        border-bottom-right-radius: 0;
+    }
+    
+    .chat-message.bot {
+        background-color: #f1f1f1;
+        align-self: flex-start;
+        margin-right: auto;
+        border-bottom-left-radius: 0;
+    }
+    
+    .typing-indicator {
+        font-style: italic;
+        color: #888;
+        padding: 5px 10px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 15px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    
+    .chat-input-container {
+        display: flex;
+        align-items: center;
+        background: white;
+        border-radius: 25px;
+        padding: 5px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        flex: 0 0 auto; /* fixed area */
+    }
+    
+    .chat-input {
+        border: none;
+        border-radius: 20px;
+        padding: 12px 15px;
+        flex-grow: 1;
+        background: transparent;
+    }
+    
+    .chat-input:focus {
+        outline: none;
+        box-shadow: none;
+    }
+    
+    .btn-send {
+        background: linear-gradient(135deg, #3a7bd5, #2a6ac5);
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        margin-left: 8px;
+        color: white;
+        box-shadow: 0 3px 8px rgba(58, 123, 213, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-send:hover {
+        transform: scale(1.05);
+        background: linear-gradient(135deg, #2a6ac5, #1a5ab5);
+    }
+    
+    /* Animations */
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes headTilt {
+        0%, 100% { transform: rotate(0); }
+        25% { transform: rotate(5deg); }
+        75% { transform: rotate(-5deg); }
+    }
+    
+    @keyframes blink {
+        0%, 90%, 100% { height: 12px; }
+        95% { height: 1px; }
+    }
+    
+    @keyframes smile {
+        0%, 100% { height: 10px; border-radius: 0 0 10px 10px; }
+        30%, 70% { height: 15px; border-radius: 0 0 15px 15px; }
+    }
+    
+    @keyframes waveLeft {
+        0%, 100% { transform: rotate(0); }
+        50% { transform: rotate(20deg); }
+    }
+    
+    @keyframes waveRight {
+        0%, 100% { transform: rotate(0); }
+        50% { transform: rotate(-20deg); }
+    }
+    
+    @keyframes showMessage {
+        0%, 70%, 100% { opacity: 0; transform: translateY(20px); }
+        10%, 60% { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    /* Chỉnh style cho tin nhắn hiện có */
+    .chat-message strong {
+        font-weight: 600;
+        color: #444;
+        margin-right: 5px;
+    }
+    
+    /* Thêm style cho scrollbar để dễ nhận biết hơn */
+    .chat-history::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chat-history::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .chat-history::-webkit-scrollbar-thumb {
+        background: #c1d1eb;
+        border-radius: 10px;
+    }
+
+    .chat-history::-webkit-scrollbar-thumb:hover {
+        background: #3a7bd5;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .chatbot-container {
+            width: 100vw !important;
+            height: 100vh !important;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            top: 0;
+            border-radius: 0 !important;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<script>
+// Remove exposed API keys and model details
+let lastUserMessage = '';
+let isRetrying = false;
+const MAX_RETRIES = 3;
+
+// Initialize chatLogs from localStorage with proper error handling
+let chatLogs = [];
+try {
+    const savedChat = localStorage.getItem('chatbotHistory');
+    if (savedChat) {
+        chatLogs = JSON.parse(savedChat);
+        console.log("Loaded chat history from localStorage:", chatLogs.length, "messages");
+    }
+} catch (error) {
+    console.error("Error loading chat history from localStorage:", error);
+    // Reset if there's an error parsing
+    localStorage.removeItem('chatbotHistory');
+}
+
+function toggleChatbot() {
+    const chatbotContainer = document.getElementById('chatbot-container');
+    const assistantContainer = document.querySelector('.assistant-container');
+    const greetingBubble = document.getElementById('greeting-bubble');
+    
+    if (chatbotContainer.style.display === 'none' || chatbotContainer.style.display === '') {
+        chatbotContainer.style.display = 'flex';
+        greetingBubble.style.animation = 'none';
+        document.getElementById('userInput').focus();
+    } else {
+        chatbotContainer.style.display = 'none';
+        greetingBubble.style.animation = 'showMessage 10s ease-in-out infinite';
+    }
+}
+
+async function sendMessage(retry = false, retryMessage = '') {
+    const input = retry ? retryMessage : document.getElementById('userInput').value.trim();
+    if (!input) return;
+    const chatHistory = document.getElementById('chatHistory');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const sendButton = document.getElementById('sendButton');
+    const userInput = document.getElementById('userInput');
+
+    if (!retry) {
+        addMessageToHistory('user', input);
+        lastUserMessage = input;
+        userInput.value = '';
+    }
+
+    userInput.disabled = true;
+    sendButton.disabled = true;
+    typingIndicator.style.display = 'block';
+
+    try {
+        // Include CSRF token for Django authentication
+        const csrfToken = getCookie('csrftoken');
+        
+        // Simplified payload - backend will handle all API configuration and user context
+        const payload = { 
+            message: input
+        };
+        
+        const headers = {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken || ''
+        };
+        
+        // Call the backend API which will use Azure AI Inference
+        const response = await fetch('/api/chat/', { 
+            method: 'POST', 
+            headers, 
+            body: JSON.stringify(payload),
+            credentials: 'same-origin' // Include cookies for authentication
+        });
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Vui lòng đăng nhập để sử dụng tính năng này');
+            }
+            throw new Error(`API error: ${response.status}`);
+        }
+        const data = await response.json();
+        
+        // Extract response content
+        const botResponse = data.content || 'No response received.';
+        addMessageToHistory('bot', botResponse);
+        isRetrying = false;
+    } catch (error) {
+        let errorMessage = error.message || 'Chào bạn, tôi có thể hỗ trợ bạn các câu hỏi liên quan đến hệ thống này và các thông tin của bạn trên hệ thống.';
+        addMessageToHistory('bot', errorMessage);
+    } finally {
+        typingIndicator.style.display = 'none';
+        document.getElementById('userInput').disabled = false;
+        document.getElementById('sendButton').disabled = false;
+    }
+}
+
+// Helper function to get CSRF token from cookies
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function retryLastMessage() {
+    if (lastUserMessage) {
+        isRetrying = true;
+        const chatHistory = document.getElementById('chatHistory');
+        const lastError = chatHistory.querySelector('.chat-message.bot:last-child');
+        if (lastError) chatHistory.removeChild(lastError);
+        sendMessage(true, lastUserMessage);
+    }
+}
+
+function addMessageToHistory(role, message) {
+    const chatHistory = document.getElementById('chatHistory');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `chat-message ${role}`;
+    // parse markdown for bot messages, escape HTML for user
+    let contentHtml;
+    if (role === 'bot') {
+        // wrap parsed markdown in markdown-body to apply GitHub CSS
+        contentHtml = '<div class="markdown-body">' + marked.parse(message) + '</div>';
+    } else {
+        contentHtml = message.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    messageDiv.innerHTML = `<strong>${role === 'user' ? 'Bạn:' : 'Trợ lý:'}</strong> ` + contentHtml;
+    chatHistory.appendChild(messageDiv);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+    
+    // Save message to chatLogs and localStorage
+    chatLogs.push({ role, content: message, timestamp: new Date().toISOString() });
+    saveToLocalStorage();
+}
+
+// Separate function to save to localStorage to ensure consistency
+function saveToLocalStorage() {
+    try {
+        localStorage.setItem('chatbotHistory', JSON.stringify(chatLogs));
+        console.log("Saved chat history to localStorage:", chatLogs.length, "messages");
+    } catch (error) {
+        console.error("Error saving chat history to localStorage:", error);
+    }
+}
+
+function clearChatHistory() {
+    document.getElementById('chatHistory').innerHTML = '';
+    chatLogs = [];
+    // Clear localStorage when user clicks the clear button
+    try {
+        localStorage.removeItem('chatbotHistory');
+        console.log("Chat history cleared from localStorage");
+    } catch (error) {
+        console.error("Error clearing chat history from localStorage:", error);
+    }
+    lastUserMessage = '';
+    isRetrying = false;
+    addMessageToHistory('bot', 'Chào bạn, tôi có thể hỗ trợ bạn các câu hỏi liên quan đến hệ thống này và các thông tin của bạn trên hệ thống');
+}
+
+// Function to load chat history from localStorage
+function loadChatHistory() {
+    const chatHistory = document.getElementById('chatHistory');
+    chatHistory.innerHTML = ''; // Clear existing messages first
+    
+    console.log("Loading chat history from localStorage, found", chatLogs.length, "messages");
+    
+    if (chatLogs && chatLogs.length > 0) {
+        // Restore messages from localStorage to the chat interface
+        chatLogs.forEach((msg, index) => {
+            if (!msg || !msg.role || !msg.content) {
+                console.warn("Skipping invalid message at index", index, msg);
+                return;
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${msg.role}`;
+            
+            let contentHtml;
+            if (msg.role === 'bot') {
+                contentHtml = '<div class="markdown-body">' + marked.parse(msg.content) + '</div>';
+            } else {
+                contentHtml = msg.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            }
+            
+            messageDiv.innerHTML = `<strong>${msg.role === 'user' ? 'Bạn:' : 'Trợ lý:'}</strong> ` + contentHtml;
+            chatHistory.appendChild(messageDiv);
+        });
+        
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+        console.log("Chat history loaded successfully");
+    } else {
+        // Add welcome message if no history exists
+        console.log("No chat history found, adding welcome message");
+        setTimeout(() => addMessageToHistory('bot', 'Xin chào! Tôi là trợ lý AI. Hãy hỏi tôi bất cứ điều gì.'), 500);
+    }
+}
+
+// Make sure we load the chat history when the page loads
+window.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM loaded, initializing chat history");
+    loadChatHistory();
+});
+
+// Backup event handler in case the first one doesn't trigger
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM loaded (alternative event), checking if chat is initialized");
+    // Only initialize if not already done
+    if (document.getElementById('chatHistory').children.length === 0) {
+        loadChatHistory();
+    }
+});
+
+window.addEventListener('online', () => addMessageToHistory('bot', 'Kết nối đã được khôi phục.'));
+window.addEventListener('offline', () => addMessageToHistory('bot', 'Bạn đang ngoại tuyến.'));
+
+// Draggable logic for chat container
+(function() {
+    const chatbot = document.getElementById('chatbot-container');
+    const header = chatbot.querySelector('.chat-header');
+    let offsetX = 0, offsetY = 0, startX = 0, startY = 0, dragging = false;
+
+    header.style.cursor = 'move';
+    header.addEventListener('mousedown', startDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('mousemove', onDrag);
+    // touch events
+    header.addEventListener('touchstart', startDrag, {passive: false});
+    document.addEventListener('touchend', endDrag);
+    document.addEventListener('touchmove', onDrag, {passive: false});
+
+    function startDrag(e) {
+        dragging = true;
+        const event = e.type === 'touchstart' ? e.touches[0] : e;
+        startX = event.clientX;
+        startY = event.clientY;
+        const rect = chatbot.getBoundingClientRect();
+        offsetX = startX - rect.left;
+        offsetY = startY - rect.top;
+        e.preventDefault();
+    }
+    function onDrag(e) {
+        if (!dragging) return;
+        const event = e.type === 'touchmove' ? e.touches[0] : e;
+        let x = event.clientX - offsetX;
+        let y = event.clientY - offsetY;
+        // keep within viewport
+        x = Math.max(0, Math.min(window.innerWidth - chatbot.offsetWidth, x));
+        y = Math.max(0, Math.min(window.innerHeight - chatbot.offsetHeight, y));
+        chatbot.style.left = x + 'px';
+        chatbot.style.top = y + 'px';
+        chatbot.style.right = 'auto';
+        chatbot.style.bottom = 'auto';
+        e.preventDefault();
+    }
+    function endDrag() { dragging = false; }
+})();
+</script>

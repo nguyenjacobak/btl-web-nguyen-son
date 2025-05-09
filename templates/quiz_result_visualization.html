@@ -1,0 +1,151 @@
+{% load static %}
+{% load custom_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ quiz.title }} | Quiz Results Visualization</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background: url('/static/images/Ptit.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 20, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 30px;
+            margin-top: 80px;
+            margin-bottom: 50px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .chart-header {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            position: relative;
+            text-align: center;
+        }
+
+        .chart-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            color: #2a6ac5;
+        }
+
+        .btn-group {
+            margin-bottom: 30px;
+        }
+
+        .btn-group .btn {
+            border-radius: 30px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-group .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(58, 123, 213, 0.3);
+        }
+
+        .chart-container {
+            display: none;
+        }
+
+        .chart-container.active {
+            display: block;
+        }
+
+        .chart-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <script>
+        function showChart(chartId) {
+            var charts = document.getElementsByClassName('chart-container');
+            for (var i = 0; i < charts.length; i++) {
+                charts[i].classList.remove('active');
+            }
+            document.getElementById(chartId).classList.add('active');
+        }
+    </script>
+</head>
+<body>
+    {% include "Components/newmenu.html" %}
+    <div class="container mt-5">
+        <div class="chart-header text-center">
+            <h1 class="chart-title">{{ quiz.title }}</h1>
+        </div>
+
+        <div class="btn-group mb-4 d-flex justify-content-center" role="group">
+            <button type="button" class="btn btn-outline-primary" onclick="showChart('histogram')">Distribution Score</button>
+            <button type="button" class="btn btn-outline-primary" onclick="showChart('pie_charts')">Rate for question levels</button>
+            <button type="button" class="btn btn-outline-primary" onclick="showChart('scatter')">Duration and Score</button>
+        </div>
+
+        <div id="histogram" class="chart-container active">
+            <img src="data:image/png;base64,{{ histogram_graphic }}" alt="Histogram of Student Scores" class="img-fluid mx-auto d-block">
+        </div>
+
+        <div id="pie_charts" class="chart-container">
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="data:image/png;base64,{{ pie_charts.1 }}" alt="Pie Chart of Answers by Difficulty 1" class="img-fluid mx-auto d-block">
+                </div>
+                <div class="col-md-4">
+                    <img src="data:image/png;base64,{{ pie_charts.2 }}" alt="Pie Chart of Answers by Difficulty 2" class="img-fluid mx-auto d-block">
+                </div>
+                <div class="col-md-4">
+                    <img src="data:image/png;base64,{{ pie_charts.3 }}" alt="Pie Chart of Answers by Difficulty 3" class="img-fluid mx-auto d-block">
+                </div>
+            </div>
+        </div>
+        <div id="scatter" class="chart-container">
+            <img src="data:image/png;base64,{{ scatter_graphic }}" alt="Scatter Plot of Time vs Score" class="img-fluid mx-auto d-block">
+        </div>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+        crossorigin="anonymous"></script>
+    {% include "Components/chat_bubble.html" %}
+</body>
+</html>

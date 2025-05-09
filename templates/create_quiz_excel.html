@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo đề từ file Excel</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-image: url('/static/images/Ptit.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 20, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: -1;
+        }
+        
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .drop-area {
+            border: 2px dashed #aaa;
+            border-radius: 10px;
+            padding: 50px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .drop-area:hover, .drop-area.active {
+            border-color: #007bff;
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+        
+        .preview-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+        }
+        
+        .question-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        
+        .question-item:hover {
+            background-color: #f1f1f1;
+        }
+        
+        .option-correct {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        .form-check-input:checked + .form-check-label {
+            color: #28a745 !important;
+            font-weight: bold;
+        }
+        
+        .form-check {
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            transition: background-color 0.2s;
+        }
+        
+        .form-check:hover {
+            background-color: rgba(0, 123, 255, 0.1);
+            cursor: pointer;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    {% include "Components/newmenu.html" %}
+
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Tạo đề kiểm tra từ file Excel</h1>
+        
+        <div class="row">
+            <div class="col-md-12 mb-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-file-excel me-2"></i>Tải lên file Excel</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="uploadForm" method="post" action="{% url 'preview_quiz_excel' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="class_id" value="{{ class_id }}">
+
+                            <div class="mb-3">
+                                <div id="drop-area" class="drop-area">
+                                    <i class="fas fa-cloud-upload-alt fa-3x mb-3"></i>
+                                    <h4>Kéo và thả file Excel vào đây hoặc click để chọn file</h4>
+                                    <p class="text-muted">Chỉ chấp nhận file Excel (.xlsx, .xls)</p>
+                                    <input type="file" id="fileInput" name="quiz_file" class="hidden" accept=".xlsx, .xls">
+                                </div>
+                                <div id="file-name" class="mt-2"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="category" class="form-label"></label>
+                                <!-- <select class="form-control" id="category" name="category" required>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                </select> -->
+                                <input type="hidden" id="category" name="category" value="{% if categories %}{{ categories.0.id }}{% else %}1{% endif %}">
+                            </div>
+
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i> File Excel phải có cấu trúc như sau:
+                                <ul class="mb-0 mt-2">
+                                    <li>Các cột: question_type, question_text, topic, subtopic, CLO, difficulty, op1, op2, op3, op4, correct</li>
+                                    <li>MCQ: câu hỏi trắc nghiệm với 4 lựa chọn</li>
+                                    <li>FIB: câu hỏi điền vào chỗ trống</li>
+                                </ul>
+                            </div>
+
+                            <button type="submit" id="previewBtn" class="btn btn-primary">
+                                <i class="fas fa-eye me-2"></i>Xem trước
+                            </button>
+                        </form>
+
+                        <div id="loader" class="loader hidden"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div id="preview-section" class="card hidden">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>Tạo đề kiểm tra</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="quizForm" method="post" action="{% url 'create_quiz_from_excel_submit' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="class_id" value="{{ class_id }}">
+                            <input type="hidden" id="excel_data" name="excel_data" value="">
+                            <input type="hidden" id="category_id" name="category_id" value="">
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="quiz_title" class="form-label">Tiêu đề đề kiểm tra</label>
+                                        <input type="text" class="form-control" id="quiz_title" name="quiz_title" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="quiz_duration" class="form-label">Thời gian làm bài (phút)</label>
+                                        <input type="number" class="form-control" id="quiz_duration" name="quiz_duration" value="45" min="1" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="quiz_description" class="form-label">Mô tả</label>
+                                <textarea class="form-control" id="quiz_description" name="quiz_description" rows="3"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Xem trước câu hỏi</label>
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Tổng số câu hỏi: <span id="question-count">0</span>
+                                </div>
+                                <div class="alert alert-info mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Bạn có thể thay đổi đáp án đúng bằng cách chọn vào ô tròn trước đáp án mong muốn.
+                                    Đáp án đúng sẽ được hiển thị màu xanh.
+                                </div>
+                                <div id="preview-container" class="preview-container">
+                                    <!-- Questions will be loaded here -->
+                                </div>
+                            </div>
+
+                            <div class="text-end">
+                                <button type="button" class="btn btn-secondary me-2" onclick="window.history.back()">
+                                    <i class="fas fa-arrow-left me-2"></i>Quay lại
+                                </button>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save me-2"></i>Tạo đề kiểm tra
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <script src="/static/cssQuan/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropArea = document.getElementById('drop-area');
+            const fileInput = document.getElementById('fileInput');
+            const fileName = document.getElementById('file-name');
+            const uploadForm = document.getElementById('uploadForm');
+            const loader = document.getElementById('loader');
+            const previewSection = document.getElementById('preview-section');
+            const previewContainer = document.getElementById('preview-container');
+            const excelDataInput = document.getElementById('excel_data');
+            const categoryIdInput = document.getElementById('category_id');
+            const questionCount = document.getElementById('question-count');
+            
+            // Handle drag and drop events
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                dropArea.classList.add('active');
+            }
+            
+            function unhighlight() {
+                dropArea.classList.remove('active');
+            }
+            
+            // Handle file drop
+            dropArea.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                fileInput.files = files;
+                updateFileName();
+            }
+            
+            // Handle file selection via click
+            dropArea.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', updateFileName);
+            
+            function updateFileName() {
+                if (fileInput.files.length > 0) {
+                    fileName.textContent = `Đã chọn file: ${fileInput.files[0].name}`;
+                } else {
+                    fileName.textContent = '';
+                }
+            }
+            
+            // Handle form submission for preview
+            uploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (fileInput.files.length === 0) {
+                    alert('Vui lòng chọn file Excel!');
+                    return;
+                }
+                
+                const formData = new FormData(uploadForm);
+                
+                loader.classList.remove('hidden');
+                
+                fetch(uploadForm.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    loader.classList.add('hidden');
+                    
+                    if (data.success) {
+                        previewSection.classList.remove('hidden');
+                        excelDataInput.value = JSON.stringify(data.questions);
+                        categoryIdInput.value = document.getElementById('category').value;
+                        questionCount.textContent = data.questions.length;
+                        
+                        // Generate preview
+                        previewContainer.innerHTML = ''; // Clear previous content
+                        
+                        data.questions.forEach((question, index) => {
+                            const questionItem = document.createElement('div');
+                            questionItem.className = 'question-item';
+                            
+                            const questionType = question.question_type.toUpperCase();
+                            const difficulty = ['', 'Dễ', 'Trung bình', 'Khó'][parseInt(question.difficulty)] || question.difficulty;
+                            
+                            let questionHTML = `
+                                <div class="d-flex justify-content-between">
+                                    <h5 class="mb-2">Câu ${index + 1}: ${question.question_text}</h5>
+                                    <span class="badge ${questionType === 'MCQ' ? 'bg-info' : 'bg-warning'}">${questionType}</span>
+                                </div>
+                                <div class="mb-2">
+                                    <span class="badge bg-secondary me-2">CLO ${question.CLO}</span>
+                                    <span class="badge bg-secondary me-2">${difficulty}</span>
+                                    <span class="badge bg-secondary me-2">${question.topic}</span>
+                                    <span class="badge bg-secondary">${question.subtopic}</span>
+                                </div>
+                            `;
+                            
+                            if (questionType === 'MCQ' && question.options) {
+                                questionHTML += '<div class="options-list mt-3">';
+                                question.options.forEach((option, optIndex) => {
+                                    const isCorrect = option.is_correct;
+                                    questionHTML += `
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" 
+                                                name="correct_answer_${index}" 
+                                                id="option_${index}_${optIndex}" 
+                                                value="${optIndex}" 
+                                                ${isCorrect ? 'checked' : ''}>
+                                            <label class="form-check-label ${isCorrect ? 'text-success fw-bold' : ''}" 
+                                                for="option_${index}_${optIndex}">
+                                                ${option.option_text}
+                                            </label>
+                                        </div>
+                                    `;
+                                });
+                                questionHTML += '</div>';
+                            }
+                            
+                            questionItem.innerHTML = questionHTML;
+                            previewContainer.appendChild(questionItem);
+                        });
+                        
+                        // Scroll to preview section
+                        previewSection.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        alert(data.error || 'Error processing Excel file');
+                    }
+                })
+                .catch(error => {
+                    loader.classList.add('hidden');
+                    console.error('Error:', error);
+                    alert('Error processing the file. Please check the file format and try again.');
+                });
+            });
+            
+            // Add event listeners for the radio buttons in the preview container
+            previewContainer.addEventListener('change', function(e) {
+                if (e.target.type === 'radio' && e.target.name.startsWith('correct_answer_')) {
+                    const questionIndex = parseInt(e.target.name.replace('correct_answer_', ''));
+                    const optionIndex = parseInt(e.target.value);
+                    
+                    // Update the excel_data hidden input
+                    updateCorrectAnswer(questionIndex, optionIndex);
+                    
+                    // Update visual feedback
+                    updateVisualFeedback(e.target);
+                    
+                    console.log(`Question ${questionIndex}: Option ${optionIndex} marked as correct`);
+                }
+            });
+            
+            // Function to update the correct answer in the excel_data
+            function updateCorrectAnswer(questionIndex, optionIndex) {
+                // Get current data
+                const questionsData = JSON.parse(excelDataInput.value);
+                
+                // Make sure we have data and options for this question
+                if (questionsData[questionIndex] && 
+                    questionsData[questionIndex].options) {
+                    
+                    // Set all options to incorrect
+                    questionsData[questionIndex].options.forEach(option => {
+                        option.is_correct = false;
+                    });
+                    
+                    // Set the selected option to correct
+                    questionsData[questionIndex].options[optionIndex].is_correct = true;
+                    
+                    // Update the hidden input
+                    excelDataInput.value = JSON.stringify(questionsData);
+                }
+            }
+            
+            // Function to update the visual feedback
+            function updateVisualFeedback(radioButton) {
+                // Find all labels in this question group
+                const labels = radioButton.closest('.options-list').querySelectorAll('.form-check-label');
+                
+                // Remove highlighting from all labels
+                labels.forEach(label => {
+                    label.classList.remove('text-success', 'fw-bold');
+                });
+                
+                // Add highlighting to the selected label
+                const selectedLabel = radioButton.nextElementSibling;
+                if (selectedLabel) {
+                    selectedLabel.classList.add('text-success', 'fw-bold');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

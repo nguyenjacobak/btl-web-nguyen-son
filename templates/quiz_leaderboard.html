@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ quiz.title }} - Bảng xếp hạng</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-image: url('/static/images/Ptit.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* Lớp overlay làm tối ảnh nền */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 20, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Simple transition for page */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Container with glassmorphism effect */
+        .container {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 30px;
+            margin-top: 80px;
+            margin-bottom: 50px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .container:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Leaderboard Title */
+        .leaderboard-title {
+            color: #3a7bd5;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .leaderboard-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #3a7bd5, transparent);
+            border-radius: 3px;
+        }
+        
+        /* Trophy icon */
+        .trophy-icon {
+            font-size: 2.5rem;
+            color: #ffc107;
+            margin-right: 15px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            animation: swing 2s infinite;
+            display: inline-block;
+        }
+        
+        @keyframes swing {
+            0% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+            100% { transform: rotate(-5deg); }
+        }
+        
+        /* Enhanced Table */
+        .leaderboard-table {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+        
+        .leaderboard-table thead {
+            background: linear-gradient(135deg, #3a7bd5, #2a6ac5);
+            color: white;
+        }
+        
+        .leaderboard-table th {
+            font-weight: 600;
+            padding: 15px;
+            border: none;
+        }
+        
+        .leaderboard-table td {
+            padding: 12px 15px;
+            border-color: rgba(0, 0, 0, 0.05);
+            vertical-align: middle;
+        }
+        
+        .leaderboard-table tbody tr {
+            transition: all 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .leaderboard-table tbody tr:hover {
+            background-color: rgba(240, 248, 255, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Rank medals */
+        .rank-1, .rank-2, .rank-3 {
+            font-weight: bold;
+        }
+        
+        .rank-1 {
+            color: #ffd700; /* Gold */
+            position: relative;
+        }
+        
+        .rank-1::after {
+            content: "👑";
+            position: absolute;
+            top: -5px;
+            right: -15px;
+            font-size: 1.2rem;
+        }
+        
+        .rank-2 {
+            color: #c0c0c0; /* Silver */
+        }
+        
+        .rank-3 {
+            color: #cd7f32; /* Bronze */
+        }
+        
+        /* Button styles */
+        .btn {
+            border-radius: 30px;
+            padding: 10px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3a7bd5, #2a6ac5);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2a6ac5, #1a5ab5);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(58, 123, 213, 0.3);
+        }
+        
+        /* No results message */
+        .no-results {
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            color: #6c757d;
+            margin: 20px 0;
+        }
+        
+        /* User profile in menu */
+        .user-profile {
+            display: none;
+        }
+        
+        /* Quick stats cards */
+        .stats-card {
+            background: rgba(255, 255, 255, 0.75);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .stats-card h5 {
+            color: #3a7bd5;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .stats-card p {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        
+        .stats-card .stats-icon {
+            font-size: 2rem;
+            opacity: 0.2;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #3a7bd5;
+        }
+    </style>
+</head>
+
+<body class="fade-in">
+    <!-- Include the newmenu component -->
+    {% include "Components/newmenu.html" %}
+    
+    <div class="container my-5">
+        <div class="d-flex justify-content-center align-items-center mb-4">
+            <span class="trophy-icon"><i class="fas fa-trophy"></i></span>
+            <h1 class="leaderboard-title mb-0">Bảng xếp hạng: {{ quiz.title }}</h1>
+        </div>
+        
+        <!-- Quick Stats Row -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="stats-card text-center position-relative">
+                    <span class="stats-icon"><i class="fas fa-users"></i></span>
+                    <h5>Người tham gia</h5>
+                    <p>{{ results|length }}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card text-center position-relative">
+                    <span class="stats-icon"><i class="fas fa-award"></i></span>
+                    <h5>Điểm cao nhất</h5>
+                    <p>{% if results %}{{ results.0.score }}{% else %}0{% endif %}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card text-center position-relative">
+                    <span class="stats-icon"><i class="fas fa-calculator"></i></span>
+                    <h5>Điểm trung bình</h5>
+                    <p id="average-score">0</p>
+                </div>
+            </div>
+        </div>
+
+        {% if results %}
+            <!-- Leaderboard Table -->
+            <div class="leaderboard-table table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col">Hạng</th>
+                            <th scope="col">Họ tên</th>
+                            <th scope="col">Mã sinh viên</th>
+                            <th scope="col">Điểm số</th>
+                            <th scope="col">Bắt đầu</th>
+                            <th scope="col">Kết thúc</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for result in results %}
+                        <tr>
+                            <th scope="row" class="{% if forloop.counter == 1 %}rank-1{% elif forloop.counter == 2 %}rank-2{% elif forloop.counter == 3 %}rank-3{% endif %}">{{ forloop.counter }}</th>
+                            <td>{{ result.user_id.first_name }} {{ result.user_id.last_name }}</td>
+                            <td>{{ result.user_id.profile.studen_id }}</td>
+                            <td class="fw-bold">{{ result.score|floatformat:2 }}</td>
+                            <td><i class="far fa-calendar-alt me-1"></i> {{ result.start_time|date:"H:i:s d-m-Y" }}</td>
+                            <td><i class="far fa-clock me-1"></i> {{ result.end_time|date:"H:i:s d-m-Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="no-results">
+                <i class="fas fa-info-circle me-2"></i> Chưa có kết quả nào cho bài kiểm tra này.
+            </div>
+        {% endif %}
+
+        <!-- Control buttons -->
+        <div class="text-center mt-4">
+            <a href="javascript:history.back()" class="btn btn-primary">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại
+            </a>
+        </div>
+    </div>
+
+    <script src="/static/cssQuan/bootstrap.bundle.min.js"></script>
+    {% include "Components/chat_bubble.html" %}
+    
+    <script>
+        // Tính điểm trung bình
+        document.addEventListener('DOMContentLoaded', function() {
+            const results = [{% for result in results %}{{ result.score }}{% if not forloop.last %},{% endif %}{% endfor %}];
+            let avgScore = 0;
+            
+            if (results.length > 0) {
+                const sum = results.reduce((a, b) => a + b, 0);
+                avgScore = (sum / results.length).toFixed(1);
+            }
+            
+            document.getElementById('average-score').innerText = avgScore;
+            
+            // Thêm hiệu ứng hover cho các dòng
+            const tableRows = document.querySelectorAll('tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('mouseover', function() {
+                    this.style.cursor = 'pointer';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

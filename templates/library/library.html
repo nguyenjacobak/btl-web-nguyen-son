@@ -1,0 +1,457 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thư Viện Sách</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="{% static 'css/library.css' %}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+</head>
+
+<body>
+    {% include 'Components/newmenu.html' %}
+
+    <!-- Hiệu ứng đám mây trang trí -->
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="cloud cloud-4"></div>
+
+    <!-- CSRF Token element -->
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    <div class="container glass-container mt-5 pt-4">
+        {% if messages %}
+            <div class="messages-container mb-4">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <div class="row">
+            <!-- Filters Section (Left) -->
+            <div class="col-md-3">
+                <div class="glass-card filter-card">
+                    <div class="card-header glass-header">
+                        <h5 class="mb-0">Bộ lọc</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="filterForm" method="GET" action="{% url 'library_home' %}">
+                            <h6 class="filter-heading">Danh mục</h6>
+                            {% for category in categories %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="category" value="{{ category.id }}" id="category{{ category.id }}" 
+                                    {% if category.id|stringformat:"i" in selected_categories %}checked{% endif %}>
+                                <label class="form-check-label" for="category{{ category.id }}">{{ category.name }}</label>
+                            </div>
+                            {% endfor %}
+                            
+                            <hr class="glass-divider">
+                            
+                            <h6 class="filter-heading">Loại sách</h6>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="price_filter" value="all" id="bookTypeAll" 
+                                    {% if price_filter == 'all' or not price_filter %}checked{% endif %}>
+                                <label class="form-check-label" for="bookTypeAll">Tất cả</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="price_filter" value="free" id="bookTypeFree"
+                                    {% if price_filter == 'free' %}checked{% endif %}>
+                                <label class="form-check-label" for="bookTypeFree">Miễn phí</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="price_filter" value="paid" id="bookTypePaid"
+                                    {% if price_filter == 'paid' %}checked{% endif %}>
+                                <label class="form-check-label" for="bookTypePaid">Trả phí</label>
+                            </div>
+                            
+                            <button type="submit" class="glass-btn mt-3 w-100">Áp dụng bộ lọc</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- User Saved Books Section -->
+                {% if user.is_authenticated %}
+                <div class="glass-card mt-4">
+                    <div class="card-header glass-header">
+                        <h5 class="mb-0">Sách đã lưu</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Bạn đã lưu <span class="fw-bold">{{ saved_books_count }}</span> sách</p>
+                        <a href="{% url 'saved_books' %}" class="glass-btn-success w-100 text-center text-decoration-none">
+                            Xem sách đã lưu
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Main Content (Right) -->
+            <div class="col-md-9">
+                <!-- Search and Admin Controls -->
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <form method="GET" action="{% url 'library_home' %}" class="d-flex">
+                            <div class="input-group glass-input-group">
+                                <input type="text" class="form-control glass-input" name="search" placeholder="Tìm kiếm sách..." value="{{ search_query|default:'' }}">
+                                <button class="glass-btn" type="submit">
+                                    <i class="fas fa-search"></i> Tìm kiếm
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        {% if user.is_superuser %}
+                        <a href="{% url 'add_book' %}" class="glass-btn-success">
+                            <i class="fas fa-plus"></i> Thêm sách mới
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Books Section -->
+                <div class="glass-card mb-4">
+                    <div class="card-header glass-header d-flex justify-content-between align-items-center">
+                        <h3 class="section-title mb-0">
+                            {% if search_query %}
+                                Kết quả tìm kiếm: "{{ search_query }}"
+                            {% else %}
+                                {% if selected_categories or price_filter %}
+                                    Sách đã lọc
+                                {% else %}
+                                    Tất cả sách
+                                {% endif %}
+                            {% endif %}
+                        </h3>
+                        <span class="badge bg-primary">{{ books.count }} sách</span>
+                    </div>
+                    <div class="card-body">
+                        <!-- Books Grid -->
+                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                            {% for book in books %}
+                            <div class="col">
+                                <div class="glass-book-card">
+                                    <div class="book-cover">
+                                        {% if book.cover_image %}
+                                            <img src="{{ book.cover_image.url }}" class="card-img-top" alt="{{ book.title }}">
+                                        {% else %}
+                                            <img src="{% static 'images/library/default-book.jpg' %}" class="card-img-top" alt="Default Cover">
+                                        {% endif %}
+                                        <span class="book-price {% if book.is_free %}free{% else %}paid{% endif %}">
+                                            {% if book.is_free %}Miễn phí{% else %}{{ book.price }} VNĐ{% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ book.title }}</h5>
+                                        <p class="card-text">Tác giả: {{ book.author }}</p>
+                                        <p class="card-text"><small class="text-muted">{{ book.category.name }}</small></p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="btn-group">
+                                                <a href="{% url 'book_detail' book.id %}" class="glass-btn-sm">
+                                                    <i class="fas fa-info-circle"></i> Chi tiết
+                                                </a>
+                                                
+                                                {% if book.is_free %}
+                                                    {% if book.id in saved_book_ids %}
+                                                        <a href="{% url 'view_book' book.id %}" class="glass-btn-primary-sm">
+                                                            <i class="fas fa-book-open"></i> Đọc
+                                                        </a>
+                                                        <button type="button" class="glass-btn-danger-sm book-saved" data-book-id="{{ book.id }}">
+                                                            <i class="fas fa-bookmark"></i> Đã lưu
+                                                        </button>
+                                                    {% else %}
+                                                        <!-- Không hiển thị nút Đọc khi chưa lưu sách -->
+                                                        <button type="button" class="glass-btn-success-sm save-book-btn" data-book-id="{{ book.id }}">
+                                                            <i class="fas fa-bookmark"></i> Lưu
+                                                        </button>
+                                                    {% endif %}
+                                                {% else %}
+                                                    {% if book.id in saved_book_ids %}
+                                                        <a href="{% url 'view_book' book.id %}" class="glass-btn-primary-sm">
+                                                            <i class="fas fa-book-open"></i> Đọc
+                                                        </a>
+                                                        <button type="button" class="glass-btn-danger-sm book-saved" data-book-id="{{ book.id }}">
+                                                            <i class="fas fa-bookmark"></i> Đã mua
+                                                        </button>
+                                                    {% else %}
+                                                        <button type="button" class="glass-btn-primary-sm buy-book-btn" data-book-id="{{ book.id }}" data-price="{{ book.price }}">
+                                                            <i class="fas fa-shopping-cart"></i> Mua
+                                                        </button>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </div>
+                                            <small class="downloads">{{ book.download_count }} lượt tải</small>
+                                        </div>
+                                        {% if user.is_superuser %}
+                                        <div class="mt-2">
+                                            <button type="button" class="glass-btn-danger-sm delete-book-btn" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#deleteModal" 
+                                                    data-book-id="{{ book.id }}"
+                                                    data-book-title="{{ book.title }}">
+                                                <i class="fas fa-trash"></i> Xóa
+                                            </button>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-12 text-center py-5">
+                                <i class="fas fa-book-open fs-1 text-muted mb-3"></i>
+                                <h4>Không tìm thấy sách nào</h4>
+                                <p class="text-muted">Hãy thử tìm kiếm với từ khóa khác hoặc thay đổi bộ lọc</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                {% if books.has_other_pages %}
+                <div class="d-flex justify-content-center">
+                    <nav aria-label="Page navigation" class="glass-pagination">
+                        <ul class="pagination">
+                            {% if books.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ books.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if price_filter %}&price_filter={{ price_filter }}{% endif %}{% for cat in selected_categories %}&category={{ cat }}{% endfor %}" aria-label="Previous">
+                                        <span aria-hidden="true">Trước</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Trước</a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for i in books.paginator.page_range %}
+                                {% if books.number == i %}
+                                    <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}{% if price_filter %}&price_filter={{ price_filter }}{% endif %}{% for cat in selected_categories %}&category={{ cat }}{% endfor %}">{{ i }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if books.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ books.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if price_filter %}&price_filter={{ price_filter }}{% endif %}{% for cat in selected_categories %}&category={{ cat }}{% endfor %}" aria-label="Next">
+                                        <span aria-hidden="true">Sau</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Sau</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal QR Thanh Toán -->
+    <div class="modal fade" id="paymentQRModal" tabindex="-1" aria-labelledby="paymentQRModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-modal">
+                <div class="modal-header glass-header">
+                    <h5 class="modal-title" id="paymentQRModalLabel">Thanh toán sách</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <h6 class="book-to-buy mb-3"></h6>
+                    <div class="price-display mb-3"></div>
+                    <img src="{% static 'images/QR_Code.png' %}" alt="Mã QR thanh toán" class="img-fluid qr-code">
+                    <p class="mt-3">Quét mã QR để thanh toán</p>
+                    <!-- Thêm thông tin nội dung chuyển khoản (sẽ được điền bằng JavaScript) -->
+                    <div class="payment-content mt-2"></div>
+                    
+                    <!-- Thêm phần hiển thị trạng thái kiểm tra thanh toán -->
+                    <div class="payment-status mt-3" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Đang kiểm tra...</span>
+                        </div>
+                        <p class="mt-2 checking-text">Đang kiểm tra thanh toán...</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="glass-btn" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="glass-btn-success complete-payment-btn">
+                        <i class="fas fa-check-circle"></i> Tôi đã chuyển khoản
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Book Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-modal">
+                <div class="modal-header glass-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa sách</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn xóa sách "<span id="deleteBookTitle"></span>" không?</p>
+                    <p class="text-danger"><strong>Lưu ý:</strong> Việc xóa sách sẽ xóa sách này khỏi danh sách đã lưu hoặc đã mua của tất cả người dùng. Đây là hành động không thể hoàn tác.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="glass-btn" data-bs-dismiss="modal">Hủy</button>
+                    <form id="deleteBookForm" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="glass-btn-danger">Xác nhận xóa</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/library.js' %}"></script>
+    <script>
+        // Xử lý hiển thị QR thanh toán khi nhấn nút mua sách
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lấy tất cả các nút "Mua" 
+            const buyButtons = document.querySelectorAll('.buy-book-btn');
+            const paymentModal = new bootstrap.Modal(document.getElementById('paymentQRModal'));
+            const userId = "{{ request.user.id }}"; // Lấy ID người dùng hiện tại
+            
+            buyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Lấy thông tin sách từ data attributes
+                    const bookId = this.getAttribute('data-book-id');
+                    const bookPrice = this.getAttribute('data-price');
+                    
+                    // Lấy tên sách từ card-title gần nhất
+                    const card = this.closest('.glass-book-card');
+                    const bookTitle = card.querySelector('.card-title').textContent;
+                    
+                    // Tạo nội dung thanh toán theo định dạng để webhook xử lý
+                    // Sử dụng định dạng không có ký tự đặc biệt
+                    const paymentContent = `PTITBOOK${bookId}${userId}`;
+                    
+                    // Cập nhật nội dung modal
+                    document.querySelector('.book-to-buy').textContent = bookTitle;
+                    document.querySelector('.price-display').textContent = `Giá: ${bookPrice} VNĐ`;
+                    
+                    // Thêm thông tin nội dung chuyển khoản vào modal
+                    const contentElement = document.querySelector('.payment-content') || document.createElement('p');
+                    contentElement.className = 'payment-content mt-2';
+                    contentElement.innerHTML = `<strong>Nội dung chuyển khoản:</strong><br><code>${paymentContent}</code>`;
+                    
+                    // Thêm vào modal nếu chưa có
+                    if (!document.querySelector('.payment-content')) {
+                        document.querySelector('.modal-body').appendChild(contentElement);
+                    }
+                    
+                    // Lưu thông tin vào nút hoàn thành thanh toán
+                    const completeButton = document.querySelector('.complete-payment-btn');
+                    completeButton.setAttribute('data-book-id', bookId);
+                    completeButton.setAttribute('data-user-id', userId);
+                    completeButton.setAttribute('data-amount', bookPrice);
+                    completeButton.setAttribute('data-content', paymentContent);
+                    
+                    // Hiển thị modal
+                    paymentModal.show();
+                    
+                    // Ẩn phần trạng thái kiểm tra
+                    document.querySelector('.payment-status').style.display = 'none';
+                });
+            });
+            
+            // Xử lý khi người dùng nhấn nút "Tôi đã chuyển khoản"
+            document.querySelector('.complete-payment-btn').addEventListener('click', function() {
+                const bookId = this.getAttribute('data-book-id');
+                const userId = this.getAttribute('data-user-id');
+                const amount = this.getAttribute('data-amount');
+                const content = this.getAttribute('data-content');
+                const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+                
+                // Hiển thị trạng thái đang kiểm tra
+                const paymentStatus = document.querySelector('.payment-status');
+                paymentStatus.style.display = 'block';
+                
+                // Ẩn nút "Tôi đã chuyển khoản" 
+                this.disabled = true;
+                
+                // Gửi request để kiểm tra thanh toán
+                fetch('/library/check-payment/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: JSON.stringify({ 
+                        book_id: bookId,
+                        user_id: userId,
+                        amount: amount,
+                        content: content
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Ẩn spinner
+                    paymentStatus.querySelector('.spinner-border').style.display = 'none';
+                    
+                    if (data.status === 'success') {
+                        // Hiển thị trạng thái thành công
+                        paymentStatus.querySelector('.checking-text').innerHTML = '<span class="text-success"><i class="fas fa-check-circle"></i> Thanh toán thành công!</span>';
+                        
+                        // Đợi 2 giây rồi đóng modal và làm mới trang
+                        setTimeout(function() {
+                            // Đóng modal
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('paymentQRModal'));
+                            modal.hide();
+                            
+                            // Làm mới trang
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        // Hiển thị trạng thái lỗi
+                        paymentStatus.querySelector('.checking-text').innerHTML = 
+                            `<span class="text-danger"><i class="fas fa-exclamation-circle"></i> ${data.message}</span>
+                            <p class="small mt-1">Nếu bạn đã chuyển khoản, vui lòng đợi trong giây lát và thử lại.</p>`;
+                        
+                        // Kích hoạt lại nút để người dùng có thể thử lại
+                        document.querySelector('.complete-payment-btn').disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    paymentStatus.querySelector('.spinner-border').style.display = 'none';
+                    paymentStatus.querySelector('.checking-text').innerHTML = 
+                        '<span class="text-danger"><i class="fas fa-exclamation-circle"></i> Đã xảy ra lỗi khi kiểm tra thanh toán. Vui lòng thử lại sau.</span>';
+                    document.querySelector('.complete-payment-btn').disabled = false;
+                });
+            });
+        });
+
+        // Set up the delete modal
+        const deleteModal = document.getElementById('deleteModal');
+        if (deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const bookId = button.getAttribute('data-book-id');
+                const bookTitle = button.getAttribute('data-book-title');
+                
+                document.getElementById('deleteBookTitle').textContent = bookTitle;
+                document.getElementById('deleteBookForm').action = `/library/delete-book/${bookId}/`;
+            });
+        }
+    </script>
+</body>
+</html>

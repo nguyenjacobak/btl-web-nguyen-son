@@ -1,0 +1,168 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sách đã lưu - Thư viện PTIT</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="{% static 'css/library.css' %}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+</head>
+
+<body>
+    {% include 'Components/newmenu.html' %}
+
+    <!-- Hiệu ứng đám mây trang trí -->
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="cloud cloud-4"></div>
+    
+    <div class="container glass-container mt-5 pt-4">
+        {% if messages %}
+            <div class="messages-container mb-4">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="m-0">Sách đã lưu</h2>
+            <a href="{% url 'library_home' %}" class="glass-btn">
+                <i class="fas fa-arrow-left"></i> Quay lại thư viện
+            </a>
+        </div>
+        
+        {% if saved_books %}
+            <div class="glass-card mb-4">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">STT</th>
+                                    <th style="width: 80px;">Ảnh</th>
+                                    <th>Tên sách</th>
+                                    <th>Tác giả</th>
+                                    <th>Danh mục</th>
+                                    <th>Thêm vào</th>
+                                    <th class="text-center">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for saved in saved_books %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        {% if saved.book.cover_image %}
+                                            <img src="{{ saved.book.cover_image.url }}" alt="{{ saved.book.title }}" class="book-thumb">
+                                        {% else %}
+                                            <img src="{% static 'images/library/default-book.jpg' %}" alt="Default" class="book-thumb">
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ saved.book.title }}</td>
+                                    <td>{{ saved.book.author }}</td>
+                                    <td>{{ saved.book.category.name }}</td>
+                                    <td>{{ saved.saved_at|date:"d/m/Y" }}</td>
+                                    <td class="text-center">
+                                        <div class="btn-group">
+                                            <a href="{% url 'view_book' saved.book.id %}" class="glass-btn-primary-sm" title="Đọc sách">
+                                                <i class="fas fa-book-open"></i>
+                                            </a>
+                                            <!-- <a href="{{ saved.book.file.url }}" download class="glass-btn-success-sm" title="Tải xuống">
+                                                <i class="fas fa-download"></i>
+                                            </a> -->
+                                            <a href="{% url 'book_detail' saved.book.id %}" class="glass-btn-sm" title="Chi tiết">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
+                                            <button type="button" class="glass-btn-danger-sm" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#removeBookModal" 
+                                                    data-book-id="{{ saved.book.id }}"
+                                                    data-book-title="{{ saved.book.title }}"
+                                                    title="Xóa khỏi danh sách">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="glass-card py-5">
+                <div class="text-center">
+                    <i class="fas fa-bookmark fa-4x mb-3 text-muted"></i>
+                    <h3>Bạn chưa lưu sách nào</h3>
+                    <p class="text-muted mb-4">Hãy khám phá thư viện và lưu những cuốn sách yêu thích của bạn.</p>
+                    <a href="{% url 'library_home' %}" class="glass-btn-primary">
+                        <i class="fas fa-search"></i> Tìm sách ngay
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Modal xác nhận xóa sách -->
+    <div class="modal fade" id="removeBookModal" tabindex="-1" aria-labelledby="removeBookModalLabel" aria-hidden="true">
+        <div class="modal-dialog glass-modal">
+            <div class="modal-content">
+                <div class="modal-header glass-modal-header">
+                    <h5 class="modal-title" id="removeBookModalLabel">Xác nhận xóa sách</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn xóa sách "<span id="bookTitleToRemove"></span>" khỏi danh sách đã lưu?</p>
+                </div>
+                <div class="modal-footer glass-modal-footer">
+                    <button type="button" class="glass-btn" data-bs-dismiss="modal">Hủy</button>
+                    <form id="removeBookForm" action="" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="glass-btn-danger">Xóa sách</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/library.js' %}"></script>
+    <script>
+        // JavaScript để xử lý modal xóa sách
+        document.addEventListener('DOMContentLoaded', function() {
+            const removeBookModal = document.getElementById('removeBookModal');
+            if (removeBookModal) {
+                removeBookModal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    const bookId = button.getAttribute('data-book-id');
+                    const bookTitle = button.getAttribute('data-book-title');
+                    
+                    document.getElementById('bookTitleToRemove').textContent = bookTitle;
+                    document.getElementById('removeBookForm').action = `/library/remove-saved-book/${bookId}/`;
+                });
+            }
+            
+            // Style cho thumbnail sách
+            document.querySelectorAll('.book-thumb').forEach(img => {
+                img.style.width = '60px';
+                img.style.height = '80px';
+                img.style.objectFit = 'cover';
+                img.style.borderRadius = '8px';
+                img.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.1)';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade Quiz | Quiz</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-image: url('/static/images/Ptit.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* Lớp overlay làm tối ảnh nền */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 20, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Simple transition for page */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Container with glassmorphism effect */
+        .container {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 30px;
+            margin-top: 80px;
+            margin-bottom: 50px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .container:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Card styling */
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #3a7bd5, #2a6ac5);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-weight: bold;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+        
+        /* Button styles */
+        .btn {
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            border: none;
+            margin: 5px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3a7bd5, #2a6ac5);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2a6ac5, #1a5ab5);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(58, 123, 213, 0.3);
+        }
+
+        /* Form controls */
+        .form-check-input {
+            cursor: pointer;
+        }
+
+        .form-check-label {
+            cursor: pointer;
+        }
+
+        .form-check-input:checked {
+            background-color: #3a7bd5;
+            border-color: #3a7bd5;
+        }
+
+        /* Page title styling */
+        .page-title {
+            color: white;
+            text-align: center;
+            margin: 2rem 0;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .page-description {
+            color: white;
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Hide user profile in menu */
+        .user-profile {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="fade-in">
+    {% include "Components/newmenu.html" %}
+
+    <h1 class="page-title">Grade Quiz: {{ quiz.title }}</h1>
+    <p class="page-description">{{ quiz.description }}</p>
+
+    <div class="container">
+        {% if no_questions %}
+            <div class="alert alert-info text-center py-4 mb-4">
+                <i class="fas fa-info-circle fa-3x mb-3"></i>
+                <h4>Không có câu hỏi cần chấm điểm</h4>
+                <p>Bài kiểm tra này không có câu hỏi tự luận hoặc tất cả câu hỏi đã được chấm điểm.</p>
+                {% if quiz.class_id %}
+                    <a href="{% url 'class_detail' quiz.class_id.id %}" class="btn btn-primary mt-3">
+                        <i class="fas fa-arrow-left me-2"></i>Quay lại lớp học
+                    </a>
+                {% else %}
+                    <a href="{% url 'all_quiz' %}" class="btn btn-primary mt-3">
+                        <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách bài kiểm tra
+                    </a>
+                {% endif %}
+            </div>
+        {% else %}
+        <form method="post" action="{% url 'mark_quiz' quiz.id %}">
+            {% csrf_token %}
+            <div class="questions my-4">
+                {% for question in text_questions %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <i class="fas fa-question-circle me-2"></i>Question {{ forloop.counter }}: {{ question.question_text }}
+                        </div>
+                        <div class="card-body">
+                            {% for answer in text_answers %}
+                                {% if answer.question_id.id == question.id and not answer.is_mark %}
+                                    <div class="mb-4 p-3" style="background: rgba(248, 249, 250, 0.5); border-radius: 10px;">
+                                        <p class="card-text"><strong><i class="fas fa-user me-2"></i>{{answer.studen_id}} :</strong> {{ answer.answer_text }}</p>
+                                        <div class="d-flex flex-wrap gap-3 mt-3">
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="correct_{{ answer.id }}" id="correct_{{ answer.id }}_true" value="true">
+                                                <label class="form-check-label" for="correct_{{ answer.id }}_true"><i class="fas fa-check-circle text-success me-1"></i>Đúng</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="correct_{{ answer.id }}" id="correct_{{ answer.id }}_false" value="false">
+                                                <label class="form-check-label" for="correct_{{ answer.id }}_false"><i class="fas fa-times-circle text-danger me-1"></i>Sai</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="correct_{{ answer.id }}" id="correct_{{ answer.id }}_acceptable" value="acceptable">
+                                                <label class="form-check-label" for="correct_{{ answer.id }}_acceptable"><i class="fas fa-star text-warning me-1"></i>Chấp nhận được</label>
+                                            </div>
+                                            <!-- <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" name="option_{{answer.id}}" id="option_{{answer.id}}" value="save">
+                                                <label class="form-check-label" for="option_{{answer.id}}"><i class="fas fa-plus-circle text-primary me-1"></i>Thêm tùy chọn</label>
+                                            </div> -->
+                                        </div>
+                                        <div class="mt-3" id="score-input-{{ answer.id }}" style="display: none;">
+                                            <label for="score_{{ answer.id }}" class="form-label"><i class="fas fa-award me-1"></i>Nhập điểm:</label>
+                                            <input type="text" class="form-control" name="score_{{ answer.id }}" id="score_{{ answer.id }}" min="0" max="{{ heso }}" placeholder="Giá trị từ 0-{{ heso|floatformat:2 }}" style="max-width: 300px;">
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane me-2"></i>Gửi điểm
+                </button>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const acceptableRadios = document.querySelectorAll('input[type="radio"][value="acceptable"]');
+    
+            acceptableRadios.forEach(radio => {
+                radio.addEventListener("change", function() {
+                    const answerId = this.name.split('_')[1];
+                    const scoreInput = document.getElementById(`score-input-${answerId}`);
+                    if (this.checked) {
+                        scoreInput.style.display = 'block';
+                    }
+                });
+            });
+    
+            const otherRadios = document.querySelectorAll('input[type="radio"][value="true"], input[type="radio"][value="false"]');
+            otherRadios.forEach(radio => {
+                radio.addEventListener("change", function() {
+                    const answerId = this.name.split('_')[1];
+                    const scoreInput = document.getElementById(`score-input-${answerId}`);
+                    if (this.checked) {
+                        scoreInput.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+    
+    <script src="/static/cssQuan/bootstrap.bundle.min.js"></script>
+    {% include "Components/chat_bubble.html" %}
+</body>
+
+</html>

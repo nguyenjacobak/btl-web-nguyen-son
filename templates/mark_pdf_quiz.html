@@ -1,0 +1,201 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chấm điểm bài làm PDF | {{ quiz.title }}</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .quiz-header {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+        .quiz-title {
+            color: #3a7bd5;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .quiz-description {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .quiz-info {
+            margin-bottom: 10px;
+        }
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .table {
+            margin-bottom: 0;
+        }
+        .table th {
+            background: #3a7bd5;
+            color: white;
+            border: none;
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(58, 123, 213, 0.05);
+        }
+        .badge {
+            padding: 6px 10px;
+            font-weight: 600;
+        }
+        .btn-view {
+            background: #3a7bd5;
+            color: white;
+        }
+        .btn-view:hover {
+            background: #2d62c0;
+            color: white;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+        .empty-state i {
+            font-size: 48px;
+            color: #adb5bd;
+            margin-bottom: 15px;
+        }
+        .section-title {
+            text-align: center;
+            color: #3a7bd5;
+            font-weight: bold;
+            margin: 30px 0;
+        }
+        .btn-back {
+            background: #6c757d;
+            color: #fff;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-back:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    {% include "Components/newmenu.html" %}
+    
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="quiz-header">
+            <h1 class="quiz-title">{{ quiz.title }}</h1>
+            <p class="quiz-description">{{ quiz.description }}</p>
+            <div class="quiz-info">
+                {% if quiz.category %}
+                    <p><strong>Danh mục:</strong> {{ quiz.category.name }}</p>
+                {% endif %}
+                <p><strong>Thời gian làm bài:</strong> {{ quiz.duration }} phút</p>
+            </div>
+        </div>
+        
+        <h2 class="section-title">Danh sách bài nộp</h2>
+        
+        {% if pdf_submissions %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">STT</th>
+                            <th scope="col">Sinh viên</th>
+                            <th scope="col">Mã sinh viên</th>
+                            <th scope="col">Thời gian nộp</th>
+                            <th scope="col">Trạng thái</th>
+                            <th scope="col">Điểm</th>
+                            <th scope="col">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for submission in pdf_submissions %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ submission.user.username }}</td>
+                                <td>{{ submission.user.profile.studen_id }}</td>
+                                <td>{{ submission.submission_date }}</td>
+                                <td>
+                                    {% if submission.is_graded %}
+                                        <span class="badge bg-success">Đã chấm</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Chưa chấm</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if submission.is_graded %}
+                                        {{ submission.score }}
+                                    {% else %}
+                                        --
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'grade_pdf_submission' submission.id %}" class="btn btn-sm btn-view">
+                                        <i class="fas fa-pen"></i> 
+                                        {% if submission.is_graded %}
+                                            Sửa điểm
+                                        {% else %}
+                                            Chấm điểm
+                                        {% endif %}
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-file-pdf"></i>
+                <h4>Chưa có bài nộp</h4>
+                <p>Hiện chưa có sinh viên nào nộp bài cho đề kiểm tra này.</p>
+            </div>
+        {% endif %}
+        
+        <div class="mt-4">
+            {% if quiz.class_id %}
+                <a href="{% url 'class_detail' quiz.class_id.id %}" class="btn btn-back">
+                    <i class="fas fa-arrow-left mr-2"></i> Quay lại lớp học
+                </a>
+            {% else %}
+                <a href="{% url 'all_quiz' %}" class="btn btn-back">
+                    <i class="fas fa-arrow-left mr-2"></i> Quay lại danh sách đề kiểm tra
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <script src="/static/cssQuan/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        /* Định kiểu cho video nền */
+        .video-background {
+            position: fixed;
+            top: 0; /* Điều chỉnh để video bắt đầu dưới thanh navbar */
+            left: 0;
+            width: 100%;
+            height: calc(100% - 20px); /* Điều chỉnh chiều cao của video */
+            object-fit: cover; /* Đảm bảo toàn bộ video được hiển thị mà không bị cắt bớt */
+            z-index: -1;
+        }
+
+        /* Định kiểu cho nội dung để đè lên video */
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+        /* Định kiểu cho footer */
+        footer {
+            position: fixed;
+            z-index: 1;
+            background-color: #f8f9fa;
+            padding: 1rem 0;
+            text-align: center;
+        }
+        @media (max-width: 1024px) {
+            .video-background {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include "Components/navbar_not_login.html" %}
+
+    <!-- Video nền -->
+    <video class="video-background" autoplay muted loop>
+        <source src="{% static 'videoBG/PTIT.mp4' %}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <br><br>
+    <div class="content">
+        <div class="container text-center my-5">
+            <h1 class="display-5 fw-bold my-2" style="color:red">Welcome to PTIT</h1>
+            <p class="fs-3">Not just make your ranking in college but also in knowledge</p>
+            <div class="d-inline-flex gap-2 mb-5">
+                <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg px-4" type="button">
+                    Login
+                </a>
+                <a href="{% url 'register' %}" class="btn btn-outline-secondary btn-lg px-4" type="button">
+                    Sign up
+                </a>
+            </div>
+        </div>
+    </div>
+    <br><br><br><br><br><br><br><br><br>
+    {% comment %} {% include "Components/footer.html" %} {% endcomment %}
+    {% include "Components/footer.html" %}
+</body>
+</html>

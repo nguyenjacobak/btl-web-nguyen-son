@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        html, body {
+            overflow-x: hidden !important;
+            overflow-y: hidden !important;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #d6e6ff;
+            background-image: url('/static/images/Ptit.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden !important;
+        }
+
+        /* Welcome text */
+        .welcome-text {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Dancing Script', cursive;
+            font-size: 4.5rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.7);
+            text-shadow:
+                0 0 15px rgba(255, 70, 70, 0.6),
+                0 0 30px rgba(255, 70, 70, 0.4),
+                0 0 45px rgba(255, 70, 70, 0.3);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-align: center;
+            z-index: 5;
+            animation: float-text 8s ease-in-out infinite;
+        }
+
+        .sub-text {
+            position: absolute;
+            top: 28%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            z-index: 5;
+            animation: float-subtext 6s ease-in-out infinite;
+            animation-delay: 1s;
+        }
+
+        @keyframes float-text {
+            0% {
+                transform: translateX(-52%) translateY(0px);
+            }
+            25% {
+                transform: translateX(-48%) translateY(-5px);
+            }
+            50% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+            75% {
+                transform: translateX(-52%) translateY(-5px);
+            }
+            100% {
+                transform: translateX(-52%) translateY(0px);
+            }
+        }
+
+        @keyframes float-subtext {
+            0% {
+                transform: translateX(-50%) translateY(0px);
+            }
+            50% {
+                transform: translateX(-50%) translateY(-5px);
+            }
+            100% {
+                transform: translateX(-50%) translateY(0px);
+            }
+        }
+
+        /* Enhanced Cloud animations - giống login page */
+        .cloud {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            box-shadow: 0 8px 16px rgba(255, 255, 255, 0.3);
+            z-index: 1;
+        }
+
+        .cloud-1 {
+            width: 120px;
+            height: 60px;
+            top: 20%;
+            left: 10%;
+            animation: float-1 25s linear infinite;
+        }
+
+        .cloud-2 {
+            width: 150px;
+            height: 70px;
+            top: 30%;
+            left: 60%;
+            animation: float-2 22s linear infinite;
+        }
+
+        .cloud-3 {
+            width: 100px;
+            height: 50px;
+            top: 15%;
+            left: 30%;
+            animation: float-3 30s linear infinite;
+        }
+
+        .cloud-4 {
+            width: 130px;
+            height: 65px;
+            top: 60%;
+            left: 75%;
+            animation: float-4 35s linear infinite;
+        }
+
+        .cloud-5 {
+            width: 90px;
+            height: 45px;
+            top: 10%;
+            left: 5%;
+            animation: float-5 28s linear infinite;
+        }
+
+        .cloud-6 {
+            width: 110px;
+            height: 55px;
+            top: 50%;
+            left: 30%;
+            animation: float-6 32s linear infinite;
+        }
+
+        .cloud-7 {
+            width: 160px;
+            height: 80px;
+            top: 25%;
+            left: 80%;
+            animation: float-7 27s linear infinite;
+        }
+
+        .cloud-8 {
+            width: 140px;
+            height: 70px;
+            top: 70%;
+            left: 15%;
+            animation: float-8 29s linear infinite;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+        }
+
+        .cloud::before {
+            width: 60%;
+            height: 100%;
+            top: -50%;
+            left: 20%;
+        }
+
+        .cloud::after {
+            width: 50%;
+            height: 100%;
+            top: -30%;
+            right: 20%;
+        }
+
+        @keyframes float-1 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(200px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes float-2 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-180px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes float-3 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(220px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes float-4 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-150px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes float-5 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(170px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes float-6 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-190px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes float-7 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-210px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes float-8 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(160px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .welcome-text {
+                font-size: 3rem;
+                top: 10%;
+            }
+            
+            .sub-text {
+                font-size: 1.2rem;
+                top: 22%;
+            }
+            
+            .cloud {
+                display: none;
+            }
+            
+            .nav-menu li a {
+                font-size: 1.3rem;
+            }
+        }
+
+        /* Whale CSS */
+        .whale {
+            position: absolute;
+            width: 100px;
+            height: 50px;
+            background: #00aaff;
+            border-radius: 50% 50% 0 0;
+            overflow: hidden;
+            z-index: 10;
+            transition: transform 0.2s ease;
+        }
+
+        .whale::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #00aaff;
+            border-radius: 50%;
+            top: -50%;
+            left: 0;
+        }
+
+        .whale::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            top: 10px;
+            left: 40px;
+        }
+
+        .whale .tail {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #00aaff;
+            border-radius: 50%;
+            top: 40px;
+            left: 40px;
+            transform: rotate(45deg);
+        }
+
+        .whale .tail::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #00aaff;
+            border-radius: 50%;
+            top: -10px;
+            left: -10px;
+        }
+
+        .whale .tail::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #00aaff;
+            border-radius: 50%;
+            top: -10px;
+            left: 10px;
+        }
+
+        /* Con cá voi */
+        .whale-container {
+            position: absolute;
+            width: 250px; /* Tăng kích thước từ 200px lên 250px */
+            height: 125px; /* Tăng kích thước từ 100px lên 125px */
+            z-index: 100;
+            pointer-events: none;
+            transform-origin: center;
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); /* Hiệu ứng quay đầu mượt mà */
+        }
+        
+        .whale-body {
+            position: relative;
+        }
+        
+        .whale-body::after {
+            position: absolute;
+            content: '';
+            background: #005f8b; /* Đổi màu đậm hơn (từ #89CFF0) */
+            height: 78px; /* Tăng kích thước tỷ lệ */
+            width: 102px; /* Tăng kích thước tỷ lệ */
+            border-bottom-left-radius: 47px;
+            border-top-left-radius: 94px;
+            border-bottom-right-radius: 31px;
+            border-top-right-radius: 219px;
+            top: 16px;
+            left: -20px;
+            z-index: 1;
+            animation: waves 3s infinite forwards;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Đổi shadow đậm hơn */
+        }
+        
+        .whale-tail {
+            position: relative;
+            top: 55px; /* Điều chỉnh vị trí để phù hợp với thân lớn hơn */
+            left: 78px; /* Điều chỉnh vị trí để phù hợp với thân lớn hơn */
+            background-color: #005f8b; /* Đổi màu đậm hơn */
+            width: 31px; /* Tăng kích thước */
+            height: 25px; /* Tăng kích thước */
+            border-radius: 10% 80%;
+            border-top-left-radius: 0;
+            z-index: 1;
+            animation: tail-wave 1.2s ease-in-out infinite, waves 3s infinite forwards;
+        }
+        
+        .whale-tail::before {
+            content: '';
+            position: absolute;
+            background-color: #005f8b; /* Đổi màu đậm hơn */
+            width: 31px; /* Tăng kích thước */
+            height: 25px; /* Tăng kích thước */
+            top: -15px;
+            left: -2px;
+            border-radius: 80% 10%;
+            margin: 0 0 -32px 0;
+            border-bottom-left-radius: 0;
+        }
+        
+        .whale-fin {
+            position: relative;
+            top: 47px; /* Điều chỉnh vị trí */
+            left: 31px; /* Điều chỉnh vị trí */
+            background-color: #005f8b; /* Đổi màu đậm hơn */
+            width: 31px; /* Tăng kích thước */
+            height: 25px; /* Tăng kích thước */
+            border-radius: 10% 80%;
+            border-top-left-radius: 0;
+            animation: waves 3s infinite forwards;
+        }
+        
+        .whale-eye {
+            z-index: 2;
+            position: relative;
+            top: 24px; /* Điều chỉnh cao hơn */
+            left: 5px; /* Điều chỉnh sang bên trái hơn */
+            background-color: white;
+            width: 13px; /* Tăng kích thước */
+            height: 13px; /* Tăng kích thước */
+            border-radius: 50%;
+            animation: blink 4s infinite;
+        }
+        
+        .whale-eye::before {
+            content: '';
+            position: absolute;
+            background-color: black;
+            width: 6px; /* Tăng kích thước */
+            height: 6px; /* Tăng kích thước */
+            top: 3.5px;
+            left: 3.5px;
+            border-radius: 50%;
+        }
+        
+        .whale-blush {
+            position: relative;
+            top: 10px; /* Điều chỉnh vị trí */
+            left: 19px; /* Điều chỉnh vị trí */
+            background-color: rgba(255, 150, 150, 0.7); /* Màu má hồng đậm hơn */
+            width: 10px; /* Tăng kích thước */
+            height: 10px; /* Tăng kích thước */
+            border-radius: 50%;
+            z-index: 2;
+            animation: waves 3s infinite forwards;
+        }
+        
+        /* Các phần khác giữ nguyên tỷ lệ nhưng tăng kích thước */
+        .whale-water {
+            border-top: 21px solid rgba(0, 68, 102, 0.8); /* Đậm hơn */
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            height: 0;
+            width: 9px;
+            border-radius: 21px;
+            top: -31px;
+            position: relative;
+            left: 15px;
+            z-index: 1;
+            opacity: 0;
+            animation: spout 6s ease-out infinite;
+        }
+        
+        .whale-puff1,
+        .whale-puff2,
+        .whale-puff3 {
+            position: relative;
+            background: rgba(0, 68, 102, 0.8); /* Đậm hơn */
+            box-shadow: 0 5px 8px rgba(255, 255, 255, 0.3);
+            height: 13px;
+            width: 13px;
+            border-radius: 50%;
+            opacity: 0;
+        }
+        
+        .whale-puff1 {
+            top: -56px;
+            left: 15px;
+            animation: move .7s .10s infinite, puff-appear 6s infinite;
+        }
+        
+        .whale-puff2 {
+            top: -68px;
+            left: 21px;
+            animation: move .8s .5s infinite, puff-appear 6s 0.2s infinite;
+        }
+        
+        .whale-puff3 {
+            top: -81px;
+            left: 28px;
+            animation: move .6s infinite, puff-appear 6s 0.4s infinite;
+        }
+        
+        .whale-drop {
+            height: 3px;
+            width: 3px;
+            border-radius: 50%;
+            background-color: rgba(0, 68, 102, 0.8); /* Đậm hơn */
+            position: absolute;
+            top: 44px;
+            left: 12px;
+            opacity: 0;
+            animation: drop-appear 4s ease-out infinite;
+        }
+        
+        .whale-drop::before {
+            content: "";
+            height: 4px;
+            width: 3px;
+            border-radius: 50%;
+            background-color: rgba(0, 68, 102, 0.8); /* Đậm hơn */
+            position: absolute;
+            top: 12px;
+            left: 5px;
+            opacity: 0;
+            animation: drop-appear 4s 0.5s ease-out infinite;
+        }
+        
+        .whale-drop::after {
+            content: "";
+            height: 5px;
+            width: 5px;
+            border-radius: 50%;
+            background-color: rgba(0, 68, 102, 0.8); /* Đậm hơn */
+            position: absolute;
+            top: 12px;
+            left: 10px;
+            opacity: 0;
+            animation: drop-appear 4s 1s ease-out infinite;
+        }
+        
+        /* Hiệu ứng bong bóng khi click - Đổi màu sang xanh biển đậm */
+        .click-bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(0, 95, 139, 0.4); /* Màu xanh biển đậm */
+            box-shadow: 0 0 15px rgba(0, 95, 139, 0.5), inset 0 0 20px rgba(0, 95, 139, 0.3);
+            transform: scale(0);
+            opacity: 0;
+            z-index: 90;
+            pointer-events: none;
+            animation: bubble-expand 1.5s ease-out forwards;
+        }
+        
+        /* Bong bóng từ cá voi - Đổi màu sang xanh biển đậm */
+        .whale-bubble {
+            position: absolute;
+            background-color: rgba(0, 95, 139, 0.4); /* Màu xanh biển đậm */
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 95, 139, 0.4), inset 0 0 15px rgba(0, 95, 139, 0.3);
+            z-index: 95;
+            opacity: 0;
+        }
+        
+        /* Animations */
+        @keyframes tail-wave {
+            0% { transform: rotate(-5deg); }
+            50% { transform: rotate(15deg); }
+            100% { transform: rotate(-5deg); }
+        }
+        
+        @keyframes spout {
+            0%, 85%, 100% { opacity: 0; height: 0; }
+            15%, 20% { opacity: 0.8; height: 18px; }
+            40% { opacity: 0; height: 25px; }
+        }
+        
+        @keyframes bubble-expand {
+            0% { transform: scale(0); opacity: 0; }
+            20% { opacity: 0.8; }
+            100% { transform: scale(4); opacity: 0; }
+        }
+        
+        @keyframes bubble-float {
+            0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+            10% { opacity: 0.9; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(1.5); opacity: 0; }
+        }
+        
+        @keyframes waves {
+            0% { transform: translate(0, 0); }
+            20% { transform: translate(-5px, 4px) rotate(-1deg); }
+            40% { transform: translate(5px, -4px) rotate(1deg); }
+            60% { transform: translate(-5px, 4px) rotate(-1deg); }
+            80% { transform: translate(5px, -4px) rotate(1deg); }
+            100% { transform: translate(0, 0); }
+        }
+        
+        @keyframes move {
+            0% { margin-top: 0; }
+            50% { margin-top: -8px; }
+            100% { margin-top: 0; }
+        }
+        
+        @keyframes puff-appear {
+            0%, 10%, 85%, 100% { opacity: 0; }
+            15%, 25% { opacity: 0.7; }
+            40% { opacity: 0; }
+        }
+        
+        @keyframes drop-appear {
+            0%, 70%, 100% { opacity: 0; transform: translateY(0); }
+            10%, 40% { opacity: 0.7; transform: translateY(-15px); }
+            60% { opacity: 0; transform: translateY(-25px); }
+        }
+        
+        @keyframes blink {
+            0%, 45%, 55%, 100% { height: 10px; }
+            50% { height: 1px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include the new menu component -->
+    {% include "Components/newmenu.html" %}
+
+    <!-- Decorative clouds -->
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="cloud cloud-4"></div>
+    <div class="cloud cloud-5"></div>
+    <div class="cloud cloud-6"></div>
+    <div class="cloud cloud-7"></div>
+    <div class="cloud cloud-8"></div>
+
+    <!-- Main content -->
+    <div class="welcome-text">Welcome to PTIT</div>
+    <div class="sub-text">Not just make your ranking in college but also in knowledge</div>
+
+    <!-- Whale -->
+    <div class="whale-container" id="whale">
+        <div class="whale-body">
+            <div class="whale-tail"></div>
+            <div class="whale-fin"></div>
+            <div class="whale-eye"></div>
+            <div class="whale-blush"></div>
+            <div class="whale-water"></div>
+            <div class="whale-puff1"></div>
+            <div class="whale-puff2"></div>
+            <div class="whale-puff3"></div>
+            <div class="whale-drop"></div>
+        </div>
+    </div>
+
+    <!-- Include the chat bubble component -->
+    {% include "Components/chat_bubble.html" %}
+
+    <script>
+        // JavaScript cập nhật cho con cá voi với hiệu ứng bong bóng khi click nhiều hơn
+        document.addEventListener('DOMContentLoaded', function() {
+            const whale = document.getElementById('whale');
+            const body = document.querySelector('body');
+            
+            // Vị trí ban đầu của cá voi (giữa màn hình)
+            let whaleX = window.innerWidth / 2 - 125; // Điều chỉnh cho kích thước cá voi lớn hơn
+            let whaleY = window.innerHeight / 2 - 60; // Điều chỉnh cho kích thước cá voi lớn hơn
+            whale.style.left = whaleX + 'px';
+            whale.style.top = whaleY + 'px';
+            
+            // Vị trí mục tiêu (điểm click)
+            let targetX = whaleX;
+            let targetY = whaleY;
+            
+            // Hướng hiện tại của cá voi (-1 = hướng phải, 1 = hướng trái)
+            let direction = -1;
+            whale.style.transform = `scaleX(${direction})`;
+            
+            // Tốc độ bơi
+            const speed = 0.03;
+            
+            // Biến để kiểm soát việc tạo bong bóng từ cá voi
+            let lastBubbleTime = 0;
+            
+            // Hàm tạo nhiều bong bóng khi click
+            function createClickBubbles(x, y) {
+                // Tạo nhiều bong bóng với kích thước khác nhau
+                for (let i = 0; i < 8; i++) {  // Tăng số lượng bong bóng lên 8
+                    const bubble = document.createElement('div');
+                    bubble.className = 'click-bubble';
+                    
+                    // Kích thước và vị trí ngẫu nhiên quanh điểm click
+                    const size = 15 + Math.random() * 25;  // Kích thước từ 15px-40px
+                    const offsetX = Math.random() * 40 - 20;
+                    const offsetY = Math.random() * 40 - 20;
+                    
+                    bubble.style.width = size + 'px';
+                    bubble.style.height = size + 'px';
+                    bubble.style.left = (x + offsetX) + 'px';
+                    bubble.style.top = (y + offsetY) + 'px';
+                    
+                    // Thời gian animation ngẫu nhiên
+                    const duration = 1 + Math.random() * 1.5;
+                    bubble.style.animation = `bubble-expand ${duration}s ease-out forwards`;
+                    
+                    document.body.appendChild(bubble);
+                    
+                    // Xóa bong bóng sau khi animation kết thúc
+                    setTimeout(() => {
+                        bubble.remove();
+                    }, duration * 1000);
+                }
+            }
+            
+            // Hàm tạo bong bóng nhỏ từ cá voi khi bơi
+            function createWhaleBubbles() {
+                const now = Date.now();
+                
+                // Tạo bong bóng thường xuyên hơn
+                if (now - lastBubbleTime < 500) return;  // Giảm thời gian từ 800ms xuống 500ms
+                lastBubbleTime = now;
+                
+                // Tính vị trí đuôi cá voi (nơi tạo bong bóng)
+                const tailX = parseFloat(whale.style.left) + (direction < 0 ? 0 : 180); // Điều chỉnh vị trí
+                const tailY = parseFloat(whale.style.top) + 60; // Điều chỉnh vị trí
+                
+                // Tạo 5 bong bóng thay vì 3 bong bóng
+                for (let i = 0; i < 5; i++) {
+                    const bubble = document.createElement('div');
+                    bubble.className = 'whale-bubble';
+                    
+                    // Kích thước ngẫu nhiên
+                    const size = 5 + Math.random() * 10;
+                    bubble.style.width = size + 'px';
+                    bubble.style.height = size + 'px';
+                    
+                    // Vị trí ban đầu gần đuôi cá voi
+                    const offsetX = Math.random() * 15 - 7;
+                    const offsetY = Math.random() * 15 - 7;
+                    bubble.style.left = (tailX + offsetX) + 'px';
+                    bubble.style.top = (tailY + offsetY) + 'px';
+                    
+                    // Hướng di chuyển ngẫu nhiên
+                    const tx = (Math.random() * 60 - 30) + 'px';
+                    const ty = (-40 - Math.random() * 30) + 'px';
+                    bubble.style.setProperty('--tx', tx);
+                    bubble.style.setProperty('--ty', ty);
+                    
+                    // Thêm animation
+                    bubble.style.animation = `bubble-float ${1 + Math.random() * 2}s ease-out forwards`;
+                    
+                    document.body.appendChild(bubble);
+                    
+                    // Xóa bong bóng sau khi animation kết thúc
+                    setTimeout(() => {
+                        bubble.remove();
+                    }, 3000);
+                }
+            }
+            
+            // Hàm cập nhật vị trí cá voi
+            function updateWhalePosition() {
+                // Tính toán khoảng cách đến mục tiêu
+                const dx = targetX - whaleX;
+                const dy = targetY - whaleY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                // Nếu cá voi đang di chuyển (khoảng cách > 5px)
+                if (dist > 5) {
+                    // Cập nhật hướng của cá voi nếu cần - Đảo ngược logic hướng
+                    if (Math.abs(dx) > 10) {
+                        const newDirection = dx > 0 ? -1 : 1; // Đảo ngược: Phải = -1, Trái = 1
+                        if (newDirection !== direction) {
+                            direction = newDirection;
+                            whale.style.transform = `scaleX(${direction})`;
+                        }
+                    }
+                    
+                    // Di chuyển cá voi từ từ về phía mục tiêu
+                    whaleX += dx * speed;
+                    whaleY += dy * speed;
+                    
+                    // Tạo bong bóng khi cá voi đang bơi
+                    createWhaleBubbles();
+                }
+                
+                // Áp dụng vị trí mới
+                whale.style.left = `${whaleX}px`;
+                whale.style.top = `${whaleY}px`;
+                
+                // Tiếp tục vòng lặp animation
+                requestAnimationFrame(updateWhalePosition);
+            }
+            
+            // Bắt đầu animation
+            updateWhalePosition();
+            
+            // Xử lý sự kiện click chuột
+            document.addEventListener('click', function(e) {
+                // Cập nhật mục tiêu mới - điều chỉnh vị trí cho cá voi lớn hơn
+                targetX = e.clientX - 125;
+                targetY = e.clientY - 60;
+                
+                // Tạo hiệu ứng bong bóng tại điểm click
+                createClickBubbles(e.clientX, e.clientY);
+            });
+            
+            // Thêm xử lý sự kiện touch cho thiết bị di động
+            document.addEventListener('touchstart', function(e) {
+                if (e.touches.length) {
+                    const touch = e.touches[0];
+                    // Cập nhật mục tiêu mới
+                    targetX = touch.clientX - 125;
+                    targetY = touch.clientY - 60;
+                    
+                    // Tạo hiệu ứng bong bóng tại điểm chạm
+                    createClickBubbles(touch.clientX, touch.clientY);
+                }
+                // Ngăn scroll mặc định nếu click vào cá voi
+                if (e.target.closest('.whale-container')) {
+                    e.preventDefault();
+                }
+            }, {passive: false});
+        });
+    </script>
+</body>
+</html>

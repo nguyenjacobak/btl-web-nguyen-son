@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả bài thi</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <style>
+        body {
+            background: url('/static/images/Ptit.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 20, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 30px;
+            margin-top: 80px;
+            margin-bottom: 50px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .quiz-header {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            position: relative;
+            text-align: center;
+        }
+
+        .quiz-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            color: #2a6ac5;
+        }
+
+        .quiz-description {
+            font-size: 1.25rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .quiz-meta {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-top: 15px;
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .question-card {
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 25px;
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .question-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-header {
+            background: rgba(255, 255, 255, 0.5);
+            color: #2a6ac5;
+            font-weight: 600;
+            padding: 15px 20px;
+            border-bottom: 2px solid rgba(58, 123, 213, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .question-number {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .question-number-badge {
+            background-color: #3a7bd5;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .list-group-item {
+            padding: 12px 20px;
+            border: 1px solid rgba(0, 0, 0, 0.125);
+            margin-bottom: 8px;
+            border-radius: 8px !important;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .list-group-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .list-group-item-success {
+            background-color: rgba(40, 167, 69, 0.15);
+            border-color: rgba(40, 167, 69, 0.3);
+            color: #155724;
+        }
+
+        .list-group-item-success:before {
+            content: '\f00c';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            margin-right: 10px;
+            color: #28a745;
+        }
+
+        .list-group-item-danger {
+            background-color: rgba(220, 53, 69, 0.15);
+            border-color: rgba(220, 53, 69, 0.3);
+            color: #721c24;
+        }
+
+        .list-group-item-danger:before {
+            content: '\f00d';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            margin-right: 10px;
+            color: #dc3545;
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #3a7bd5, #2a6ac5);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 5px 15px rgba(58, 123, 213, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            background: linear-gradient(135deg, #2a6ac5, #1a5ab5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(58, 123, 213, 0.4);
+        }
+
+        .card-footer {
+            background-color: rgba(255, 255, 255, 0.5);
+            border-top: 1px solid rgba(0,0,0,0.05);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .card-footer a {
+            text-decoration: none;
+            color: #3a7bd5;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    {% include "Components/newmenu.html" %}
+
+    <div class="container my-5">
+        <div class="quiz-header text-center">
+            <h1 class="quiz-title">{{ quiz.title }}</h1>
+            <p class="quiz-description">{{ quiz.description }}</p>
+            <div class="quiz-meta">
+                <i class="far fa-calendar-alt me-2"></i>{{ quiz.created_at }}
+            </div>
+        </div>
+
+        <div class="questions my-4">
+            {% for question in questions %}
+                <div class="question-card mb-4">
+                    <div class="card-header">
+                        <div class="question-number">
+                            <span class="question-number-badge">{{ forloop.counter }}</span>
+                            <span>Question {{ forloop.counter }}</span>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">
+                            {% if question.question_type == 'MCQ' %}Multiple Choice{% elif question.question_type == 'FIB' %}Fill in the Blank{% endif %}
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <p class="question-text">{{ question.question_text }}</p>
+                        {% if question.question_type == 'MCQ' %}
+                            <ul class="list-group">
+                                {% for answer in full_student_answers %}
+                                    {% if answer.question_id.id == question.id and answer.quiz_result_id.id == quiz_result.id %}
+                                        <li class="list-group-item {% if answer.option_1.id == answer.selected_option.id %} {% if answer.option_1.is_correct %}list-group-item-success{% else %}list-group-item-danger{% endif %} {% elif answer.option_1.is_correct %}list-group-item-success{% endif %}">
+                                            {{ answer.option_1.option_text }}
+                                        </li>
+                                        <li class="list-group-item {% if answer.option_2.id == answer.selected_option.id %} {% if answer.option_2.is_correct %}list-group-item-success{% else %}list-group-item-danger{% endif %} {% elif answer.option_2.is_correct %}list-group-item-success{% endif %}">
+                                            {{ answer.option_2.option_text }}
+                                        </li>
+                                        <li class="list-group-item {% if answer.option_3.id == answer.selected_option.id %} {% if answer.option_3.is_correct %}list-group-item-success{% else %}list-group-item-danger{% endif %} {% elif answer.option_3.is_correct %}list-group-item-success{% endif %}">
+                                            {{ answer.option_3.option_text }}
+                                        </li>
+                                        <li class="list-group-item {% if answer.option_4.id == answer.selected_option.id %} {% if answer.option_4.is_correct %}list-group-item-success{% else %}list-group-item-danger{% endif %} {% elif answer.option_4.is_correct %}list-group-item-success{% endif %}">
+                                            {{ answer.option_4.option_text }}
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        {% elif question.question_type == 'FIB' %}
+                            <ul class="list-group">
+                                {% for answer in full_student_answers %}
+                                    {% if answer.question_id.id == question.id and answer.quiz_result_id.id == quiz_result.id %}
+                                        <li class="list-group-item">
+                                            <strong>Your answer:</strong> {{ answer.answer_text }}
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="card-footer">
+            <a href="{% url 'welcome' %}" class="btn btn-back">
+                <i class="fas fa-arrow-left me-2"></i>Back to Home
+            </a>
+        </div>
+    </div>
+
+    <script src="/static/cssQuan/bootstrap.bundle.min.js"></script>
+    {% include "Components/chat_bubble.html" %}
+</body>
+</html>

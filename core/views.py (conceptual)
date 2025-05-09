@@ -1,0 +1,64 @@
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+import json
+import logging
+import os
+
+# Import Azure AI Inference libraries
+from azure.ai.inference import ChatCompletionsClient
+from azure.ai.inference.models import SystemMessage, UserMessage
+from azure.core.credentials import AzureKeyCredential
+
+# Configuration - properly secured on the server
+ENDPOINT = "https://models.github.ai/inference"
+MODEL = "meta/Llama-4-Scout-17B-16E-Instruct"
+GITHUB_TOKEN = "" # Better to use environment variable
+
+# Initialize client
+client = ChatCompletionsClient(
+    endpoint=ENDPOINT,
+    credential=AzureKeyCredential(GITHUB_TOKEN),
+)
+
+@csrf_exempt
+@require_POST
+def chat_api(request):
+    try:
+        data = json.loads(request.body)
+        user_message = data.get('message', '')
+        
+        if not user_message:
+            return JsonResponse({
+                'content': 'Yêu cầu không hợp lệ: Tin nhắn không được để trống.',
+                'question': ''
+            }, status=400)
+        
+        # Call Azure AI Inference - all configuration is done server-side
+        response = client.complete(
+            messages=[
+                SystemMessage(""),
+                UserMessage(user_message),
+            ],
+            temperature=0.8,
+            top_p=0.1,
+            max_tokens=2048,
+            model=MODEL
+        )
+        
+        if response and hasattr(response, 'choices') and response.choices:
+            final_content = response.choices[0].message.content.strip()
+        else:
+            final_content = "Xin lỗi, tôi không thể tạo phản hồi vào lúc này."
+            
+    except Exception as e:
+        logging.error(f"Chat API error: {str(e)}")
+        return JsonResponse({
+            'content': f"Lỗi từ dịch vụ AI",
+            'question': user_message
+        }, status=500)
+        
+    return JsonResponse({
+        'content': final_content,
+        'question': user_message
+    })

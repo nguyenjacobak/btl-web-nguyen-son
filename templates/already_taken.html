@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đã làm bài | Thông báo</title>
+  <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="shortcut icon" href="/static/images/favicon.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
+    
+    body {
+      background-image: url('/static/images/Ptit.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-position: center;
+      position: relative;
+      min-height: 100vh;
+    }
+    
+    /* Lớp overlay làm tối ảnh nền */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 20, 0.7);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Simple transition for page */
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    /* Container with glassmorphism effect */
+    .container {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 30px;
+      margin-top: 80px;
+      margin-bottom: 50px;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      max-width: 800px;
+    }
+
+    .container:hover {
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Message styling */
+    .message-card {
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .message-icon {
+      font-size: 5rem;
+      color: #3a7bd5;
+      margin-bottom: 1.5rem;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    
+    .message-title {
+      color: #3a7bd5;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+    }
+    
+    .message-text {
+      color: #555;
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    
+    /* Button styles */
+    .btn {
+      border-radius: 30px;
+      padding: 12px 30px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+      margin: 8px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #3a7bd5, #2a6ac5);
+      border: none;
+    }
+    
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #2a6ac5, #1a5ab5);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 12px rgba(58, 123, 213, 0.3);
+    }
+    
+    .btn-outline-secondary {
+      border: 2px solid #6c757d;
+      background: transparent;
+      color: #6c757d;
+    }
+    
+    .btn-outline-secondary:hover {
+      background-color: #6c757d;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 12px rgba(108, 117, 125, 0.3);
+    }
+    
+    /* User profile in menu */
+    .user-profile {
+      display: none;
+    }
+  </style>
+</head>
+
+<body class="fade-in">
+  <!-- Include the newmenu component -->
+  {% include "Components/newmenu.html" %}
+  
+  <div class="container my-5">
+    <div class="message-card">
+      <div class="message-icon">
+        <i class="fas fa-clipboard-check"></i>
+      </div>
+      <h1 class="message-title">Bài kiểm tra đã hoàn thành</h1>
+      <p class="message-text">
+        Bạn đã hoàn thành bài kiểm tra này và không thể làm lại.
+        <br>
+        Bạn có thể xem điểm số và kết quả chi tiết trong trang lớp học.
+      </p>
+      <div class="d-flex justify-content-center flex-wrap mt-4">
+        <a href="{% url 'my_classes' %}" class="btn btn-primary">
+          <i class="fas fa-chalkboard me-2"></i>Các lớp học
+        </a>
+        <a href="{% url 'welcome' %}" class="btn btn-outline-secondary">
+          <i class="fas fa-home me-2"></i>Trang chủ
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/cssQuan/bootstrap.bundle.min.js"></script>
+</body>
+</html>

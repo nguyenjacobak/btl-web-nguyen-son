@@ -1,0 +1,171 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo đề kiểm tra PDF</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #3a7bd5;
+            font-weight: bold;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .btn-submit {
+            width: 100%;
+            background: #3a7bd5;
+            color: #fff;
+            font-weight: bold;
+            padding: 10px 0;
+        }
+        .file-upload {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        .file-upload:hover {
+            border-color: #3a7bd5;
+        }
+        .file-upload i {
+            font-size: 48px;
+            color: #3a7bd5;
+            margin-bottom: 10px;
+        }
+        .file-name {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        .alert-info {
+            background-color: #e8f4f8;
+            border-color: #b8e3f3;
+            color: #31708f;
+        }
+    </style>
+</head>
+<body>
+    {% include "Components/newmenu.html" %}
+    
+    <div class="container">
+        <div class="header">
+            <h1>Tạo đề kiểm tra PDF</h1>
+        </div>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> Sinh viên sẽ xem đề kiểm tra dưới dạng PDF và nộp bài dưới dạng PDF
+        </div>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="class_id" value="{{ class_id }}">
+            
+            <div class="form-group">
+                <label for="quiz_title">Tiêu đề đề kiểm tra</label>
+                <input type="text" class="form-control" id="quiz_title" name="quiz_title" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="quiz_description">Mô tả</label>
+                <textarea class="form-control" id="quiz_description" name="quiz_description" rows="3" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="quiz_duration">Thời gian làm bài (phút)</label>
+                <input type="number" class="form-control" id="quiz_duration" name="quiz_duration" value="45" min="1" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Tải lên file đề kiểm tra (PDF)</label>
+                <div class="file-upload" id="dropzone">
+                    <i class="fas fa-file-pdf"></i>
+                    <p>Kéo và thả file PDF vào đây hoặc click để chọn file</p>
+                    <input type="file" class="d-none" id="quiz_file" name="quiz_file" accept=".pdf" required>
+                    <div class="file-name" id="file-name"></div>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-submit">
+                <i class="fas fa-save mr-2"></i> Tạo đề kiểm tra
+            </button>
+        </form>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('quiz_file');
+            const fileName = document.getElementById('file-name');
+            
+            dropzone.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            dropzone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#3a7bd5';
+                this.style.backgroundColor = '#f8f9fa';
+            });
+            
+            dropzone.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#ccc';
+                this.style.backgroundColor = 'transparent';
+            });
+            
+            dropzone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#ccc';
+                this.style.backgroundColor = 'transparent';
+                
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    updateFileName(e.dataTransfer.files[0].name);
+                }
+            });
+            
+            fileInput.addEventListener('change', function() {
+                if (this.files.length) {
+                    updateFileName(this.files[0].name);
+                }
+            });
+            
+            function updateFileName(name) {
+                fileName.textContent = name;
+                fileName.style.color = '#3a7bd5';
+                fileName.style.fontWeight = 'bold';
+            }
+        });
+    </script>
+    
+    <script src="/static/cssQuan/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

@@ -1,0 +1,290 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đọc {{ book.title }}</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="{% static 'css/library.css' %}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+    <!-- Thêm Turn.js và jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/flipbook.css' %}">
+    <style>
+        /* PDF viewer styles */
+        .flipbook-container {
+            width: 100%;
+            height: calc(100vh - 180px);
+            min-height: 600px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #flipbook {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .flipbook-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            z-index: 100;
+        }
+        
+        .book-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .control-btn {
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .glass-container {
+            margin-top: 80px;
+        }
+        
+        /* Thêm CSS cho trang đọc sách */
+        .book-title-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background: rgba(59, 130, 246, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+        
+        .book-title {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .book-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .book-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .flipbook-nav {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .page-display {
+            margin: 0 15px;
+            color: #fff;
+            font-weight: 500;
+        }
+        
+        /* Page styling */
+        .page {
+            background-color: white;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .page img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .hard {
+            background: #3a7bd5;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 767.98px) {
+            .glass-container {
+                margin-top: 60px;
+                padding: 10px;
+            }
+            
+            .flipbook-container {
+                height: calc(100vh - 150px);
+            }
+            
+            .book-title {
+                font-size: 1rem;
+            }
+            
+            .book-meta {
+                display: none;
+            }
+            
+            .control-btn {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+            }
+        }
+        
+        /* Thêm CSS cho nút điều chỉnh chất lượng */
+        .quality-controls {
+            display: flex;
+            gap: 5px;
+            margin-left: 15px;
+        }
+        
+        .quality-btn {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+        
+        @media (max-width: 992px) {
+            .flipbook-nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .quality-controls {
+                margin-top: 10px;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'Components/newmenu.html' %}
+
+    <!-- Hiệu ứng đám mây trang trí -->
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="cloud cloud-4"></div>
+    
+    <div class="container glass-container">
+        <div class="book-title-bar">
+            <h1 class="book-title">{{ book.title }}</h1>
+            <div class="book-meta">
+                <span><i class="fas fa-user"></i> {{ book.author }}</span>
+                <span><i class="fas fa-folder"></i> {{ book.category.name }}</span>
+            </div>
+        </div>
+        
+        <div class="book-controls">
+            <div>
+                <a href="{% url 'book_detail' book.id %}" class="glass-btn control-btn">
+                    <i class="fas fa-arrow-left"></i> Quay lại
+                </a>
+            </div>
+            <!-- <div>
+                <a href="{{ book.file.url }}" download class="glass-btn-primary control-btn">
+                    <i class="fas fa-download"></i> Tải xuống
+                </a>
+            </div> -->
+        </div>
+        
+        <div class="flipbook-container">
+            <div class="flipbook-loading">
+                <div>
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Đang tải sách...</p>
+                </div>
+            </div>
+            
+            <!-- Thêm element gáy sách -->
+            <div class="book-spine"></div>
+            
+            <div id="flipbook">
+                <!-- Trang sẽ được tạo động bằng JavaScript -->
+            </div>
+        </div>
+        
+        <div class="flipbook-nav">
+            <button id="prevBtn" class="glass-btn control-btn">
+                <i class="fas fa-chevron-left"></i> Trang trước
+            </button>
+            <span class="page-display">
+                Trang <span id="currentPage">0</span> / <span id="totalPages">0</span>
+            </span>
+            <button id="nextBtn" class="glass-btn control-btn">
+                Trang sau <i class="fas fa-chevron-right"></i>
+            </button>
+            
+            <!-- Thêm nút điều chỉnh chất lượng -->
+            <div class="quality-controls">
+                <button class="glass-btn control-btn quality-btn" onclick="changeRenderQuality('low')">
+                    <i class="fas fa-tachometer-alt"></i> Chất lượng thấp
+                </button>
+                <button class="glass-btn control-btn quality-btn" onclick="changeRenderQuality('medium')">
+                    <i class="fas fa-tachometer-alt"></i> Chất lượng vừa
+                </button>
+                <button class="glass-btn control-btn quality-btn" onclick="changeRenderQuality('high')">
+                    <i class="fas fa-tachometer-alt"></i> Chất lượng cao
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Biến chứa đường dẫn tới file PDF
+        const pdfUrl = "{{ book.file.url }}";
+        const bookTitle = "{{ book.title }}";
+        // Truyền URL ảnh bìa sách
+        const coverImageUrl = "{% if book.cover_image %}{{ book.cover_image.url }}{% else %}{% static 'images/library/default-book.jpg' %}{% endif %}";
+        const bookAuthor = "{{ book.author }}";
+    </script>
+    <script src="{% static 'js/flipbook.js' %}"></script>
+</body>
+</html>

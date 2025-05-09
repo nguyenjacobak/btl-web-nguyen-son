@@ -1,0 +1,867 @@
+{% load custom_tags %}
+{% load static %}
+{% csrf_token %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ class.name }} | Class</title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+    <link rel="stylesheet" href="/static/cssQuan/icon_all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-image: url('/static/images/Ptit.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* Lớp overlay làm tối ảnh nền */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 20, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: -1;
+            pointer-events: none; /* Fix để không che modal */
+        }
+
+        /* Clouds for background */
+        .cloud {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1);
+            z-index: -1;
+            opacity: 0.4;
+            pointer-events: none; /* Fix để không che modal */
+        }
+
+        .cloud-1 {
+            width: 120px;
+            height: 60px;
+            top: 20%;
+            left: 10%;
+            animation: float-1 25s linear infinite;
+        }
+
+        .cloud-2 {
+            width: 150px;
+            height: 70px;
+            top: 30%;
+            left: 60%;
+            animation: float-2 22s linear infinite;
+        }
+
+        .cloud-3 {
+            width: 100px;
+            height: 50px;
+            top: 15%;
+            left: 30%;
+            animation: float-3 30s linear infinite;
+        }
+
+        .cloud-4 {
+            width: 130px;
+            height: 65px;
+            top: 60%;
+            left: 75%;
+            animation: float-4 35s linear infinite;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .cloud::before {
+            width: 60%;
+            height: 100%;
+            top: -50%;
+            left: 20%;
+        }
+
+        .cloud::after {
+            width: 50%;
+            height: 100%;
+            top: -30%;
+            right: 20%;
+        }
+
+        @keyframes float-1 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(100px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes float-2 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-80px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes float-3 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(120px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes float-4 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-90px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Simple transition for page */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Container with glassmorphism effect */
+        .container {
+            background-color: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 30px;
+            margin-top: 80px;
+            margin-bottom: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Class header */
+        .class-header {
+            color: #3a7bd5;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .class-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #3a7bd5, transparent);
+            border-radius: 3px;
+        }
+
+        /* Card and Button styles */
+        .card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #3a7bd5;
+            margin-bottom: 15px;
+        }
+
+        .card .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            padding: 0 !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50% !important;
+            border: none !important;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn {
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: #3a7bd5;
+            border-color: #3a7bd5;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2a6ac5;
+            border-color: #2a6ac5;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(58, 123, 213, 0.3);
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        /* Notification */
+        #notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        /* Modal fix */
+        .modal-backdrop {
+            z-index: 1040;
+        }
+        
+        .modal {
+            z-index: 1050;
+        }
+        
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eaeaea;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .modal-title {
+            color: #3a7bd5;
+            font-weight: 700;
+        }
+        
+        .modal-body-scrollable {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .modal-footer-fixed {
+            position: sticky;
+            bottom: 0;
+            background-color: white;
+            padding: 10px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        /* Input group styles */
+        .input-group {
+            position: relative;
+        }
+        
+        .remove-input {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: rgba(0, 0, 0, 0.5);
+            z-index: 5;
+        }
+        
+        /* Hide user profile in menu */
+        .user-profile {
+            display: none;
+        }
+
+        /* Fix modal issues */
+        .modal-backdrop {
+            z-index: 1040 !important;
+        }
+        
+        .modal {
+            z-index: 1050 !important;
+        }
+        
+        /* Ensure modals are clickable */
+        .modal-dialog {
+            pointer-events: all;
+        }
+        
+        /* Fix for elements blocking modal interactions */
+        .cloud, .cloud::before, .cloud::after {
+            pointer-events: none !important;
+        }
+    </style>
+</head>
+
+<body class="fade-in">
+    <!-- Decorative clouds -->
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="cloud cloud-4"></div>
+
+    <!-- Include the newmenu component -->
+    {% include "Components/newmenu.html" %}
+        <!-- Notification -->
+    <div id="notification"></div>
+    
+    <div class="container mt-4">
+        <!-- Thông tin lớp học -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="class-header">{{ class.name }}</h1>
+                <p class="mb-2"><strong>Giảng viên:</strong> {{ class.instructor.username }}</p>
+                <p class="mb-2"><strong>Mã lớp:</strong> {{ class.code }}</p>
+                <p class="mb-2">
+                    <strong>Thành viên:</strong> {{ student_count }}
+                    <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#studentListModal">
+                        <i class="fas fa-eye me-1"></i>Xem danh sách
+                    </button>
+                </p>
+                {% if user == class.instructor %}
+                    <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addDocumentModal">
+                        <i class="fas fa-file-upload me-2"></i>Thêm tài liệu
+                    </button>
+                {% endif %}
+            </div>
+            <div>
+                {% if user == class.instructor %}
+                    <button type="button" class="btn btn-primary position-relative me-2" data-bs-toggle="modal" data-bs-target="#approveMembersModal">
+                        <i class="fas fa-user-check me-1"></i>Phê duyệt
+                        {% if class_requests %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ class_requests|length }}
+                                <span class="visually-hidden">thành viên chờ phê duyệt</span>
+                            </span>
+                        {% endif %}
+                    </button>
+                    <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#addMembersModal">
+                        <i class="fas fa-user-plus me-1"></i>Thêm thành viên
+                    </button>
+                    <div class="dropdown d-inline-block">
+                        <button class="btn btn-success dropdown-toggle" type="button" id="addQuizDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-plus me-1"></i>Thêm bài kiểm tra
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="addQuizDropdown">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'quiz_excel_upload' class.id %}">
+                                    <i class="fas fa-file-excel me-2"></i>Tạo đề kiểm tra từ Excel
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'create_pdf_quiz' class.id %}">
+                                    <i class="fas fa-file-pdf me-2"></i>Tạo đề kiểm tra PDF
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <hr class="my-4">
+        
+        
+        <!-- Bài kiểm tra -->
+        <h3 class="mb-3" style="color:#3a7bd5; font-weight:600;">Bài kiểm tra</h3>
+        <div class="row">
+            {% if quizzes %}
+                {% for quiz in quizzes %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body position-relative">
+                                <h5 class="card-title">{{ quiz.title }}
+                                    {% if user == class.instructor %}
+                                        <button type="button" class="btn btn-danger btn-sm delete-btn" data-quiz-id="{{ quiz.id }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    {% endif %}
+                                </h5>
+                                <p class="card-text">{{ quiz.description }}</p>
+                                <p class="card-text"><strong>Số câu hỏi:</strong> {{ quiz.total_questions }}</p>
+                                <p class="card-text"><strong>Ngày tạo:</strong> {{ quiz.created_at|date:"d/m/Y" }}</p>
+                                
+                                {% if user == class.instructor %}
+                                    <div class="form-check mb-3">
+                                        <form method="post" action="{% url 'activate_quiz' quiz.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <label class="form-check-label d-flex align-items-center">
+                                                <input type="checkbox" class="form-check-input me-2" name="active" {% if quiz.active %}checked{% endif %} onchange="this.form.submit()">
+                                                Kích hoạt
+                                            </label>
+                                        </form>
+                                    </div>
+                                {% endif %}
+
+                                <!-- Reorganized quiz buttons -->
+                                {% if quiz.active %}
+                                    <!-- Student actions -->
+                                    <div class="d-flex flex-wrap gap-2 mb-2">
+                                        <a href="{% url 'start_quiz' quiz.id %}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-play me-1"></i>Làm bài
+                                        </a>
+                                        <div class="dropdown d-inline">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="quizActionsDropdown{{ quiz.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-bars me-1"></i>Xem thêm
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="quizActionsDropdown{{ quiz.id }}">
+                                                <li>
+                                                    <a class="dropdown-item" href="{% url 'user_quiz_result' quiz.id %}">
+                                                        <i class="fas fa-poll-h me-1"></i>Kết quả
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="{% url 'quiz_leaderboard' quiz.id %}">
+                                                        <i class="fas fa-trophy me-1"></i>Bảng xếp hạng
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Instructor actions -->
+                                    {% if user == class.instructor %}
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <a href="{% url 'mark_quiz' quiz.id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-check-square me-1"></i>Chấm điểm
+                                        </a>
+                                        <a href="{% url 'quiz_result_visualize' quiz.id %}" class="btn btn-sm btn-outline-warning">
+                                            <i class="fas fa-chart-bar me-1"></i>Thống kê
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                {% else %}
+                                    {% if user != class.instructor %}
+                                        <p class="text-muted">Bài kiểm tra chưa được kích hoạt.</p>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>Chưa có bài kiểm tra nào.
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <hr class="my-4">
+        
+        <!-- Tài liệu -->
+        <h3 class="mb-3" style="color:#3a7bd5; font-weight:600;">Tài liệu</h3>
+        <div class="row">
+            {% if class.documents.all %}
+                {% for document in class.documents.all %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ document.title }}
+                                    {% if user == class.instructor %}
+                                        <button type="button" class="btn btn-danger btn-sm delete-btn" data-document-id="{{ document.id }}">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    {% endif %}
+                                </h5>
+                                <p class="card-text">{{ document.description }}</p>
+                                <p class="card-text"><small class="text-muted">Ngày tải lên: {{ document.upload_date|date:"d/m/Y" }}</small></p>
+                                
+                                <div class="mt-3">
+                                    <!-- <a href="#" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewDocumentModal{{ document.id }}">
+                                        <i class="fas fa-eye me-1"></i>Xem
+                                    </a> -->
+                                    <a href="{{ document.file.url }}" class="btn btn-outline-secondary btn-sm" download>
+                                        <i class="fas fa-download me-1"></i>Tải xuống
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Modal Xem Tài Liệu
+                    <div class="modal fade" id="viewDocumentModal{{ document.id }}" tabindex="-1" aria-labelledby="viewDocumentModalLabel{{ document.id }}" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="viewDocumentModalLabel{{ document.id }}">{{ document.title }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    {% if document.file.url|slice:"-4:" == ".pdf" %}
+                                        <iframe src="{% static 'pdfjs/web/viewer.html' %}?file={{ document.file.url|urlencode }}" width="100%" height="600px" style="border: none;"></iframe>
+                                    {% elif document.file.url|slice:"-5:" == ".docx" %}
+                                        <iframe src="https://docs.google.com/gview?url={% absolute_uri document.file.url %}&embedded=true" style="width:100%; height:600px;" frameborder="0"></iframe>
+                                    {% else %}
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle me-2"></i>Không thể xem trước tệp tin này. Vui lòng tải xuống để xem.
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    <a href="{{ document.file.url }}" class="btn btn-primary" download>
+                                        <i class="fas fa-download me-1"></i>Tải xuống
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>Chưa có tài liệu nào.
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div> <!-- Đóng container đúng vị trí -->
+    
+    <!-- Modal xem danh sách sinh viên -->
+    <div class="modal fade" id="studentListModal" tabindex="-1" aria-labelledby="studentListModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="studentListModalLabel">Danh sách sinh viên lớp {{ class.name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Họ và tên</th>
+                                    <th>Tên đăng nhập</th>
+                                    <th>Mã sinh viên</th>
+                                    <th>Lớp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in student_list %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ student.profile.full_name|default:student.username }}</td>
+                                    <td>{{ student.username }}</td>
+                                    <td>{{ student.profile.studen_id|default:"Chưa cập nhật" }}</td>
+                                    <td>{{ student.profile.user_class|default:"Chưa cập nhật" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">Chưa có sinh viên nào trong lớp.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    {% if user == class.instructor %}
+                        <a href="{% url 'export_members' class.id %}" class="btn btn-primary">
+                            <i class="fas fa-file-export me-1"></i>Xuất danh sách
+                        </a>
+                    {% endif %}
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal phê duyệt thành viên -->
+    <div class="modal fade" id="approveMembersModal" tabindex="-1" aria-labelledby="approveMembersModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="approveMembersModalLabel">Phê duyệt thành viên</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if class_requests %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Tên người dùng</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for request in class_requests %}
+                                        <tr>
+                                            <td>{{ request.student.profile.full_name }}</td>
+                                            <td>{{ request.student.profile.studen_id }}</td>
+                                            <td>
+                                                <div class="d-flex">
+                                                    <form method="post" action="{% url 'approve_request' request.id %}">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-success btn-sm me-2">
+                                                            <i class="fas fa-check me-1"></i>Đồng ý
+                                                        </button>
+                                                    </form>
+                                                    <form method="post" action="{% url 'reject_request' request.id %}">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-danger btn-sm">
+                                                            <i class="fas fa-times me-1"></i>Từ chối
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>Không có yêu cầu tham gia nào.
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal thêm thành viên -->
+    <div class="modal fade" id="addMembersModal" tabindex="-1" aria-labelledby="addMembersModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addMembersModalLabel">Thêm thành viên vào lớp</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'add_members' class.id %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Nhập tên người dùng</label>
+                            <div id="usernames-container">
+                                <div class="input-group mb-2">
+                                    <input type="text" name="usernames" class="form-control" placeholder="Nhập tên người dùng">
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="addUsernameField">
+                                <i class="fas fa-plus me-1"></i>Thêm trường
+                            </button>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-user-plus me-1"></i>Thêm
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal thêm tài liệu -->
+    <div class="modal fade" id="addDocumentModal" tabindex="-1" aria-labelledby="addDocumentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addDocumentModalLabel">Thêm tài liệu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'add_document' class.id %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Tiêu đề</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Tệp tin</label>
+                            <input class="form-control" type="file" id="file" name="file" required>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Lưu
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+<script src="/static/cssQuan/bootstrap.bundle.min.js"></script>
+<script>
+    // Wait for document to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add new username field
+        document.getElementById('addUsernameField').addEventListener('click', function() {
+            var container = document.getElementById('usernames-container');
+            var inputGroup = document.createElement('div');
+            inputGroup.className = 'input-group mb-2';
+            
+            var input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'usernames';
+            input.className = 'form-control';
+            input.placeholder = 'Nhập tên người dùng';
+            
+            var removeButton = document.createElement('span');
+            removeButton.className = 'btn btn-outline-danger';
+            removeButton.innerHTML = '<i class="fas fa-times"></i>';
+            removeButton.onclick = function() {
+                inputGroup.remove();
+            };
+            
+            inputGroup.appendChild(input);
+            inputGroup.appendChild(removeButton);
+            container.appendChild(inputGroup);
+        });
+
+        // Add event listeners for delete buttons
+        document.querySelectorAll('.delete-btn[data-quiz-id]').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var quizId = this.getAttribute('data-quiz-id');
+                confirmDelete(quizId);
+            });
+        });
+        
+        document.querySelectorAll('.delete-btn[data-document-id]').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var documentId = this.getAttribute('data-document-id');
+                confirmDeleteDocument(documentId);
+            });
+        });
+    });
+
+    // Confirm delete quiz
+    function confirmDelete(quizId) {
+        if (confirm('Bạn có chắc chắn muốn xóa bài kiểm tra này không? Hành động này không thể hoàn tác.')) {
+            fetch("{% url 'delete_quiz' 0 %}".replace('0', quizId), {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    var notification = document.getElementById('notification');
+                    notification.textContent = 'Đã xóa bài kiểm tra thành công!';
+                    notification.style.display = 'block';
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        location.reload();
+                    }, 2000);
+                } else {
+                    alert('Không thể xóa bài kiểm tra.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Đã xảy ra lỗi khi xóa bài kiểm tra.');
+            });
+        }
+    }
+    
+    // Confirm delete document
+    function confirmDeleteDocument(documentId) {
+        if (confirm('Bạn có chắc chắn muốn xóa tài liệu này không? Hành động này không thể hoàn tác.')) {
+            fetch("{% url 'delete_document' 0 %}".replace('0', documentId), {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    var notification = document.getElementById('notification');
+                    notification.textContent = 'Đã xóa tài liệu thành công!';
+                    notification.style.display = 'block';
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        location.reload();
+                    }, 2000);
+                } else {
+                    alert('Không thể xóa tài liệu.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Đã xảy ra lỗi khi xóa tài liệu.');
+            });
+        }
+    }
+</script>
+</body>
+</html>

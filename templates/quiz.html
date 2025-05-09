@@ -1,0 +1,464 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ quiz.title }} | Quiz </title>
+    <link rel="stylesheet" href="/static/cssQuan/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
+    <link rel="stylesheet" href="/static/cssQuan/icon_all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-image: url('/static/images/Ptit.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* Lớp overlay làm tối ảnh nền */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 20, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Simple transition for page */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Container with enhanced glassmorphism effect */
+        .container {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 30px;
+            margin-top: 80px;
+            margin-bottom: 50px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .container:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Quiz title styling */
+        .quiz-title {
+            color: #3a7bd5;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        
+        .quiz-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #3a7bd5, transparent);
+            border-radius: 3px;
+        }
+        
+        .quiz-description {
+            color: #444;
+            font-weight: 500;
+        }
+        
+        /* Enhanced glassmorphism cards */
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            background: #3a7bd5;
+            color: white;
+            font-weight: bold;
+            border-radius: 15px 15px 0 0 !important;
+            border: none;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        /* Enhanced button styles */
+        .btn {
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3a7bd5, #2a6ac5);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2a6ac5, #1a5ab5);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(58, 123, 213, 0.3);
+        }
+        
+        /* Countdown styling */
+        #countdown {
+            color: #dc3545;
+            font-weight: bold;
+            font-size: 1.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 5px 15px;
+            border-radius: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        /* Form elements styling */
+        .form-check-input:checked {
+            background-color: #3a7bd5;
+            border-color: #3a7bd5;
+        }
+        
+        .form-control {
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #3a7bd5;
+            box-shadow: 0 0 0 0.25rem rgba(58, 123, 213, 0.25);
+        }
+        
+        /* Modal styles */
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eaeaea;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .modal-title {
+            color: #3a7bd5;
+            font-weight: 700;
+        }
+        
+        /* User card styling */
+        .user-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            overflow: hidden;
+        }
+        
+        .user-card:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .user-card .card-img-top {
+            object-fit: cover;
+            height: 150px;
+        }
+        
+        /* Fix modal issues */
+        .modal-backdrop {
+            z-index: 1040 !important;
+        }
+        
+        .modal {
+            z-index: 1050 !important;
+        }
+        
+        /* Ensure modals are clickable */
+        .modal-dialog {
+            pointer-events: all;
+        }
+        
+        /* Hide user profile in menu */
+        .user-profile {
+            display: none;
+        }
+        
+        /* Question styling */
+        .questions .card:nth-child(odd) .card-header {
+            background: linear-gradient(135deg, #3a7bd5, #2d69be);
+        }
+        
+        .questions .card:nth-child(even) .card-header {
+            background: linear-gradient(135deg, #3a7bd5, #4989da);
+        }
+        
+        .badge {
+            padding: 6px 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+
+<body class="fade-in">
+    <!-- Include the newmenu component -->
+    {% include "Components/newmenu.html" %}
+    
+    <!-- User Info Section -->
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
+        <div class="user-card text-center border-0" style="width: 150px;">
+            <img src="{{ user.profile.profile_img.url }}" alt="User Image" class="card-img-top" style="border-radius: 15px 15px 0 0;">
+            <div class="card-body p-2">
+                <p class="card-text mb-1 fw-bold">{{ user.username }}</p>
+                <p class="card-text mb-0 text-muted">{{ user.profile.full_name }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h1 class="quiz-title display-5 mb-3">{{ quiz.title }}</h1>
+        <p class="quiz-description mb-4">{{ quiz.description }}</p>
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <span class="text-muted">
+                <i class="far fa-calendar-alt me-2"></i>{{ quiz.created_at }}
+            </span>
+            <span id="countdown">
+                <i class="far fa-clock me-2"></i>00:00
+            </span>
+        </div>
+
+        <hr class="my-4">
+
+        <form method="post" action="{% url 'quiz_result' quiz.id quiz_result.id %}" id="quiz">
+            {% csrf_token %}
+            <div class="questions my-4">
+                {% for question in questions %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Câu hỏi {{ forloop.counter }}</span>
+                                <span class="badge bg-light text-dark">{{ question.question_type }}</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text mb-4 fs-5">{{ question.question_text }}</p>
+                            {% if question.question_type == 'MCQ' %}
+                                {% for option in options %}
+                                    {% for sub_option in option %}
+                                        {% if question.id == sub_option.question_id %}
+                                            <div class="form-check mb-3 p-2 rounded hover-effect" style="transition: all 0.2s ease;">
+                                                <input class="form-check-input" type="radio" name="{{ question.id }}" id="option{{ sub_option.id }}" value="{{ sub_option.id }}">
+                                                <label class="form-check-label" for="option{{ sub_option.id }}">
+                                                    {{ sub_option.option_text }}
+                                                </label>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                            {% elif question.question_type == 'FIB' %}
+                                <div class="form-group">
+                                    <input type="text" class="form-control" name="{{ question.id }}" placeholder="Nhập câu trả lời của bạn">
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="d-grid gap-2 col-6 mx-auto mb-5">
+                <button type="button" class="btn btn-primary btn-lg" id="submit-btn">
+                    <i class="fas fa-paper-plane me-2"></i>Nộp bài
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Modal xác nhận -->
+    <div class="modal fade" id="confirmSubmitModal" tabindex="-1" aria-labelledby="confirmSubmitModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmSubmitModalLabel">Xác nhận nộp bài</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Bạn có chắc chắn muốn nộp bài không?
+                    </div>
+                    <p>Sau khi nộp bài, bạn sẽ không thể quay lại để chỉnh sửa.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Hủy bỏ
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="confirm-submit">
+                        <i class="fas fa-check me-2"></i>Nộp bài
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        var quizTime = {{ remaining_time }};
+
+        function startCountdown(duration, display) {
+            var timer = duration, minutes, seconds;
+            var countdownInterval = setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.innerHTML = '<i class="far fa-clock me-2"></i>' + minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    clearInterval(countdownInterval);
+                    alert("Hết giờ! Bài làm của bạn sẽ được nộp tự động.");
+                    document.querySelector('form').submit();
+                }
+            }, 1000);
+        }
+
+        window.onload = function () {
+            var display = document.querySelector('#countdown');
+            startCountdown(quizTime, display);
+            
+            // Thêm hiệu ứng hover cho các câu trả lời
+            const formChecks = document.querySelectorAll('.form-check');
+            formChecks.forEach(item => {
+                item.addEventListener('mouseover', function() {
+                    this.style.backgroundColor = 'rgba(58, 123, 213, 0.1)';
+                });
+                
+                item.addEventListener('mouseout', function() {
+                    this.style.backgroundColor = 'transparent';
+                });
+            });
+        };
+    </script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Function to save answers to Local Storage
+            function saveAnswers() {
+                const inputs = document.querySelectorAll("input[type='radio'], input[type='text']");
+                inputs.forEach(input => {
+                    input.addEventListener("change", function() {
+                        if (input.type === 'radio' && input.checked) {
+                            localStorage.setItem(input.name, input.value);
+                        } else if (input.type === 'text') {
+                            localStorage.setItem(input.name, input.value);
+                        }
+                    });
+                });
+            }
+
+            // Function to load answers from Local Storage
+            function loadAnswers() {
+                const inputs = document.querySelectorAll("input[type='radio'], input[type='text']");
+                inputs.forEach(input => {
+                    const savedValue = localStorage.getItem(input.name);
+                    if (savedValue) {
+                        if (input.type === 'radio' && input.value === savedValue) {
+                            input.checked = true;
+                        } else if (input.type === 'text') {
+                            input.value = savedValue;
+                        }
+                    }
+                });
+            }
+            
+            // Call functions to save and load answers
+            saveAnswers();
+            loadAnswers();
+        });
+        
+        function clearAnswers() {
+            const inputs = document.querySelectorAll("input[type='radio'], input[type='text']");
+            inputs.forEach(input => {
+                localStorage.removeItem(input.name);
+            });
+        }
+        
+        const submitBtn = document.getElementById("submit-btn");
+        submitBtn.addEventListener("click", function(event) {
+            event.preventDefault();
+            const confirmModal = new bootstrap.Modal(document.getElementById('confirmSubmitModal'));
+            confirmModal.show();
+        });
+        
+        const confirmSubmitBtn = document.getElementById("confirm-submit");
+        confirmSubmitBtn.addEventListener("click", function() {
+            clearAnswers(); // Xóa các câu trả lời trong Local Storage nếu cần
+            document.getElementById("quiz").submit(); // Nộp form
+        });
+    </script>
+    
+    <script src="/static/cssQuan/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,981 @@
+/* Library Page Styles */
+
+/* Banner styles */
+.library-banner {
+    margin-bottom: 30px;
+}
+
+.carousel-item {
+    height: 350px;
+}
+
+.carousel-item img {
+    object-fit: cover;
+    height: 100%;
+    filter: brightness(0.7);
+}
+
+.carousel-caption {
+    bottom: 50%;
+    transform: translateY(50%);
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.carousel-caption h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+/* Filter styles */
+.filter-heading {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* Book card styles */
+.book-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.book-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.book-cover {
+    position: relative;
+    height: 250px;
+    overflow: hidden;
+}
+
+.book-cover img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+}
+
+.book-card:hover .book-cover img {
+    transform: scale(1.05);
+}
+
+.book-price {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.book-price.free {
+    background-color: #28a745;
+    color: white;
+}
+
+.book-price.paid {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.section-title {
+    position: relative;
+    padding-bottom: 10px;
+    margin-bottom: 5px;
+    font-weight: 700;
+    color: #333;
+}
+
+.section-title:after {
+    content: '';
+    position: absolute;
+    width: 60px;
+    height: 3px;
+    background-color: #007bff;
+    bottom: 0;
+    left: 0;
+}
+
+/* Pagination styling */
+.pagination .page-link {
+    color: #007bff;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+/* Modal styles */
+.modal-header {
+    border-bottom: 2px solid rgba(0,0,0,0.1);
+}
+
+.modal-footer {
+    border-top: 2px solid rgba(0,0,0,0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .carousel-item {
+        height: 200px;
+    }
+    
+    .carousel-caption h2 {
+        font-size: 1.5rem;
+    }
+    
+    .carousel-caption p {
+        font-size: 0.9rem;
+        display: none;
+    }
+    
+    .book-cover {
+        height: 200px;
+    }
+}
+
+/* Glassmorphism Library Page Styles */
+
+:root {
+    --glass-bg: rgba(255, 255, 255, 0.25);
+    --glass-bg-hover: rgba(255, 255, 255, 0.35);
+    --glass-border: rgba(255, 255, 255, 0.25);
+    --glass-shadow: rgba(0, 0, 0, 0.15);
+    --glass-header-bg: rgba(59, 130, 246, 0.3);
+    --glass-primary: rgba(59, 130, 246, 0.7);
+    --glass-success: rgba(16, 185, 129, 0.7);
+    --glass-danger: rgba(239, 68, 68, 0.7);
+    --glass-text: rgba(15, 23, 42, 0.9);
+    --glass-border-radius: 16px;
+    --glass-blur: 12px;
+}
+
+body {
+    background-image: url('/static/images/Ptit.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: var(--glass-text);
+    position: relative;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* Lớp overlay làm tối ảnh nền - giống myClass */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 20, 0.7);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: -1;
+}
+
+/* Clouds for background - giống myClass */
+.cloud {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1);
+    z-index: -1;
+    opacity: 0.4;
+}
+
+.cloud-1 {
+    width: 120px;
+    height: 60px;
+    top: 20%;
+    left: 10%;
+    animation: float-1 25s linear infinite;
+}
+
+.cloud-2 {
+    width: 150px;
+    height: 70px;
+    top: 30%;
+    left: 60%;
+    animation: float-2 22s linear infinite;
+}
+
+.cloud-3 {
+    width: 100px;
+    height: 50px;
+    top: 15%;
+    left: 30%;
+    animation: float-3 30s linear infinite;
+}
+
+.cloud-4 {
+    width: 130px;
+    height: 65px;
+    top: 60%;
+    left: 75%;
+    animation: float-4 35s linear infinite;
+}
+
+.cloud::before,
+.cloud::after {
+    content: '';
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+}
+
+.cloud::before {
+    width: 60%;
+    height: 100%;
+    top: -50%;
+    left: 20%;
+}
+
+.cloud::after {
+    width: 50%;
+    height: 100%;
+    top: -30%;
+    right: 20%;
+}
+
+@keyframes float-1 {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(100px); }
+    100% { transform: translateX(0); }
+}
+
+@keyframes float-2 {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(-80px); }
+    100% { transform: translateX(0); }
+}
+
+@keyframes float-3 {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(120px); }
+    100% { transform: translateX(0); }
+}
+
+@keyframes float-4 {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(-90px); }
+    100% { transform: translateX(0); }
+}
+
+/* Thiết kế banner mới - Sáng tạo bằng CSS */
+.library-banner {
+    margin-top: 70px;
+    margin-bottom: 30px;
+    position: relative;
+    height: 250px;
+    background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.library-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+    opacity: 0.5;
+}
+
+.library-banner::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 150px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='0.15' d='M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,117.3C672,107,768,117,864,138.7C960,160,1056,192,1152,186.7C1248,181,1344,139,1392,117.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") no-repeat bottom;
+    background-size: 100%;
+    transform: translateY(-50%);
+}
+
+.banner-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    width: 100%;
+    z-index: 2;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.banner-content h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+}
+
+.banner-content p {
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin: 0 auto;
+    opacity: 0.9;
+}
+
+/* Glassmorphism container và cards - làm đậm hơn */
+.glass-container {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-radius: var(--glass-border-radius);
+    border: 1px solid var(--glass-border);
+    padding: 20px;
+    box-shadow: 0 8px 32px 0 var(--glass-shadow);
+    margin-bottom: 30px;
+    margin-top: 20px;
+}
+
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-radius: var(--glass-border-radius);
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+    box-shadow: 0 4px 16px 0 var(--glass-shadow);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.glass-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px 0 var(--glass-shadow);
+}
+
+.glass-header {
+    background: var(--glass-header-bg);
+    color: var(--glass-text);
+    padding: 15px 20px;
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* Glassmorphism buttons */
+.glass-btn,
+.glass-btn-success,
+.glass-btn-primary,
+.glass-btn-danger,
+.glass-btn-sm,
+.glass-btn-primary-sm,
+.glass-btn-danger-sm,
+.glass-btn-success-sm {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    color: var(--glass-text);
+    padding: 10px 20px;
+    border-radius: 30px;
+    transition: all 0.3s;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 10px 0 var(--glass-shadow);
+}
+
+.glass-btn:hover {
+    background: var(--glass-bg-hover);
+    box-shadow: 0 5px 15px 0 var(--glass-shadow);
+}
+
+.glass-btn-success, .glass-btn-success-sm {
+    background: var(--glass-success);
+    color: white;
+}
+
+.glass-btn-primary, .glass-btn-primary-sm {
+    background: var(--glass-primary);
+    color: white;
+}
+
+.glass-btn-danger, .glass-btn-danger-sm {
+    background: var(--glass-danger);
+    color: white;
+}
+
+.glass-btn-sm,
+.glass-btn-primary-sm,
+.glass-btn-danger-sm,
+.glass-btn-success-sm {
+    padding: 3px 8px; /* Giảm padding */
+    font-size: 0.75rem; /* Giảm kích thước chữ */
+    text-decoration: none;
+    display: inline-block;
+    margin-right: 2px; /* Thêm margin nhỏ giữa các nút */
+}
+
+.glass-btn-primary-sm:hover, 
+.glass-btn-danger-sm:hover,
+.glass-btn-success-sm:hover,
+.glass-btn-sm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    color: white;
+    text-decoration: none;
+}
+
+/* Book saved state */
+.book-saved {
+    background: rgba(220, 53, 69, 0.2) !important;
+    color: #dc3545 !important;
+    border: 1px solid rgba(220, 53, 69, 0.3) !important;
+}
+
+.book-saved:hover {
+    background: rgba(220, 53, 69, 0.3) !important;
+}
+
+/* Glassmorphism form elements */
+.glass-input,
+.glass-input-group .form-control {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    color: var(--glass-text);
+    border-radius: 25px;
+    padding: 10px 20px;
+    transition: all 0.3s;
+}
+
+.glass-input:focus,
+.glass-input-group .form-control:focus {
+    background: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 10px 0 rgba(59, 130, 246, 0.3);
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+.glass-input-group {
+    display: flex;
+}
+
+/* Book card styles with glassmorphism - làm đậm hơn */
+.glass-book-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-radius: var(--glass-border-radius);
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+    box-shadow: 0 4px 16px 0 var(--glass-shadow);
+    height: 100%;
+    transition: transform 0.3s, box-shadow 0.3s;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s forwards;
+    display: flex;
+    flex-direction: column;
+}
+
+.glass-book-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px 0 var(--glass-shadow);
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.book-cover {
+    position: relative;
+    height: 250px; /* Tăng chiều cao để hiển thị đầy đủ ảnh bìa */
+    overflow: hidden;
+    flex-shrink: 0; /* Ngăn không cho co lại */
+}
+
+.book-cover img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain; /* Thay đổi từ cover sang contain để hiển thị đầy đủ ảnh */
+    transition: transform 0.5s;
+    background-color: rgba(255, 255, 255, 0.1); /* Thêm nền nhẹ để ảnh rõ hơn */
+}
+
+.glass-book-card:hover .book-cover img {
+    transform: scale(1.05);
+}
+
+.book-price {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+}
+
+.book-price.free {
+    background-color: rgba(16, 185, 129, 0.7);
+    color: white;
+}
+
+.book-price.paid {
+    background-color: rgba(245, 158, 11, 0.7);
+    color: white;
+}
+
+.glass-book-card .card-body {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Cho phép mở rộng để lấp đầy không gian còn lại */
+}
+
+.glass-book-card .card-title {
+    font-size: 1rem;
+    margin-bottom: 5px;
+    max-height: 42px; /* Giới hạn chiều cao cho tiêu đề */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Giới hạn 2 dòng */
+    -webkit-box-orient: vertical;
+}
+
+.glass-book-card .card-text {
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+    max-height: 38px; /* Giới hạn chiều cao */
+    overflow: hidden;
+}
+
+.downloads {
+    font-size: 0.8rem;
+    color: rgba(15, 23, 42, 0.7);
+}
+
+/* Section title */
+.section-title {
+    color: var(--glass-text);
+    font-weight: 700;
+    position: relative;
+}
+
+/* Glassmorphism pagination */
+.glass-pagination .pagination {
+    margin-top: 30px;
+}
+
+.glass-pagination .page-link {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    color: var(--glass-text);
+    margin: 0 3px;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.glass-pagination .page-item.active .page-link {
+    background: var(--glass-primary);
+    color: white;
+    border-color: var(--glass-primary);
+}
+
+.glass-pagination .page-link:hover {
+    background: var(--glass-bg-hover);
+    color: var(--glass-text);
+}
+
+/* Messages container */
+.messages-container .alert {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: var(--glass-border-radius);
+}
+
+.alert-success {
+    background-color: rgba(16, 185, 129, 0.2) !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+    color: #10b981 !important;
+}
+
+.alert-danger {
+    background-color: rgba(239, 68, 68, 0.2) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: #ef4444 !important;
+}
+
+.alert-info {
+    background-color: rgba(59, 130, 246, 0.2) !important;
+    border-color: rgba(59, 130, 246, 0.3) !important;
+    color: #3b82f6 !important;
+}
+
+/* Animation delay for books */
+.col:nth-child(1) .glass-book-card { animation-delay: 0.1s; }
+.col:nth-child(2) .glass-book-card { animation-delay: 0.2s; }
+.col:nth-child(3) .glass-book-card { animation-delay: 0.3s; }
+.col:nth-child(4) .glass-book-card { animation-delay: 0.4s; }
+.col:nth-child(5) .glass-book-card { animation-delay: 0.5s; }
+.col:nth-child(6) .glass-book-card { animation-delay: 0.6s; }
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .library-banner {
+        margin-top: 60px;
+        height: 180px;
+    }
+    
+    .banner-content h1 {
+        font-size: 2rem;
+    }
+    
+    .banner-content p {
+        font-size: 1rem;
+    }
+    
+    .glass-container {
+        padding: 15px;
+    }
+    
+    .col-md-3, .col-md-9 {
+        padding: 0 10px;
+    }
+    
+    .glass-book-card .book-cover {
+        height: 180px;
+    }
+}
+
+/* Added floating elements for visual interest */
+.floating-shapes {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.shape {
+    position: absolute;
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: 50%;
+    opacity: 0.5;
+}
+
+.shape1 {
+    width: 100px;
+    height: 100px;
+    background: rgba(59, 130, 246, 0.15);
+    top: 10%;
+    left: 5%;
+    animation: floatBubble 15s infinite ease-in-out;
+}
+
+.shape2 {
+    width: 150px;
+    height: 150px;
+    background: rgba(16, 185, 129, 0.15);
+    top: 60%;
+    left: 15%;
+    animation: floatBubble 18s infinite ease-in-out;
+    animation-delay: 2s;
+}
+
+.shape3 {
+    width: 80px;
+    height: 80px;
+    background: rgba(245, 158, 11, 0.15);
+    top: 30%;
+    right: 10%;
+    animation: floatBubble 12s infinite ease-in-out;
+    animation-delay: 1s;
+}
+
+.shape4 {
+    width: 120px;
+    height: 120px;
+    background: rgba(239, 68, 68, 0.15);
+    top: 75%;
+    right: 15%;
+    animation: floatBubble 20s infinite ease-in-out;
+    animation-delay: 3s;
+}
+
+@keyframes floatBubble {
+    0%, 100% {
+        transform: translateY(0) translateX(0);
+    }
+    25% {
+        transform: translateY(-20px) translateX(10px);
+    }
+    50% {
+        transform: translateY(0) translateX(20px);
+    }
+    75% {
+        transform: translateY(20px) translateX(10px);
+    }
+}
+
+/* Animation delay for books */
+.col:nth-child(1) .glass-book-card { animation-delay: 0.1s; }
+.col:nth-child(2) .glass-book-card { animation-delay: 0.2s; }
+.col:nth-child(3) .glass-book-card { animation-delay: 0.3s; }
+.col:nth-child(4) .glass-book-card { animation-delay: 0.4s; }
+.col:nth-child(5) .glass-book-card { animation-delay: 0.5s; }
+.col:nth-child(6) .glass-book-card { animation-delay: 0.6s; }
+
+/* Glass toast notifications */
+.glass-toast {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: var(--glass-border-radius);
+    color: var(--glass-text);
+    box-shadow: 0 4px 16px 0 var(--glass-shadow);
+}
+
+.glass-toast-header {
+    background: var(--glass-header-bg);
+    border-bottom: 1px solid var(--glass-border);
+    color: var(--glass-text);
+}
+
+/* Thêm style cho trang chi tiết sách */
+.book-detail-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.book-cover-large {
+    height: 350px;
+    overflow: hidden;
+    position: relative;
+}
+
+.book-cover-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+}
+
+.book-cover-large:hover img {
+    transform: scale(1.05);
+}
+
+.book-price-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-top: 15px;
+}
+
+.book-price-badge.free {
+    background-color: rgba(16, 185, 129, 0.7);
+    color: white;
+}
+
+.book-price-badge.paid {
+    background-color: rgba(245, 158, 11, 0.7);
+    color: white;
+}
+
+.book-stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    color: var(--glass-text);
+}
+
+.book-description {
+    margin-top: 10px;
+    white-space: pre-line;
+    color: var(--glass-text);
+    line-height: 1.6;
+}
+
+.additional-info {
+    color: var(--glass-text);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.additional-info p {
+    margin-bottom: 5px;
+}
+
+/* Styles for related books */
+.glass-book-card-sm {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+    height: 100%;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.glass-book-card-sm:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.book-cover-sm {
+    height: 120px;
+    overflow: hidden;
+}
+
+.book-cover-sm img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.glass-book-card-sm:hover .book-cover-sm img {
+    transform: scale(1.1);
+}
+
+.book-info-sm {
+    padding: 10px;
+    text-align: center;
+}
+
+.book-info-sm h6 {
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--glass-text);
+}
+
+.book-info-sm small {
+    color: rgba(15, 23, 42, 0.7);
+}
+
+.book-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
+}
+
+/* CSS cho trang saved-books */
+.glass-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.glass-table th {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--glass-text);
+    font-weight: 600;
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-table td {
+    padding: 10px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--glass-text);
+}
+
+.glass-table tbody tr {
+    transition: background-color 0.3s;
+}
+
+.glass-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.glass-table .glass-btn-sm,
+.glass-table .glass-btn-primary-sm,
+.glass-table .glass-btn-success-sm,
+.glass-table .glass-btn-danger-sm {
+    padding: 4px 8px;
+    margin: 0 2px;
+}
+
+/* Điều chỉnh khoảng cách giữa các nút trong btn-group */
+.btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px; /* Khoảng cách giữa các nút */
+}
+
+/* Đảm bảo text không bị tràn */
+.glass-book-card .card-title {
+    font-size: 1rem;
+    margin-bottom: 5px;
+    max-height: 42px; /* Giới hạn chiều cao cho tiêu đề */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Giới hạn 2 dòng */
+    -webkit-box-orient: vertical;
+}
+
+.glass-book-card .card-text {
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+    max-height: 38px; /* Giới hạn chiều cao */
+    overflow: hidden;
+}
+
+/* Điều chỉnh card-body để đảm bảo cân đối */
+.glass-book-card .card-body {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Cho phép mở rộng để lấp đầy không gian còn lại */
+}
+
+/* Điều chỉnh phần hiển thị lượt tải và nút để nằm dưới cùng */
+.glass-book-card .d-flex.justify-content-between.align-items-center {
+    margin-top: auto; /* Đẩy xuống dưới */
+}
+
+/* Chỉnh sửa icon trong nút để nhỏ hơn */
+.glass-btn-sm i,
+.glass-btn-primary-sm i,
+.glass-btn-danger-sm i,
+.glass-btn-success-sm i {
+    font-size: 0.7rem;
+}
