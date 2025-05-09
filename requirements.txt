@@ -9,6 +9,5 @@ matplotlib==3.9.2
 seaborn==0.13.2
 requests==2.31.0
 azure-ai-inference==1.0.0b9
-azure-core==1.29.5
 openai==1.5.0
 python-dotenv==1.0.0
