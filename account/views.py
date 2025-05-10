@@ -146,7 +146,8 @@ def register(request):
             return redirect('register')
 
     context = {}
-    return render(request, "login.html", context)
+    # return render(request, "login.html", context)
+    return render(request, "register1.html", context)
 
 @login_required(login_url='login')
 @never_cache

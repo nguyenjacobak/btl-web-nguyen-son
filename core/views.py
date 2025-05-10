@@ -60,10 +60,11 @@ HƯỚNG DẪN PHẢN HỒI:
 
 3. Nếu người dùng yêu cầu dữ liệu của người khác:
    => Trả lời "Bạn không có quyền truy cập thông tin này."
+   => Tuy nhiên các bài viết của người khác trong diễn đàn lại công khai, nếu người dùng hỏi bạn hoàn toàn có thể trả lời.
 
 4. LƯU Ý QUAN TRỌNG:
    - Luôn sử dụng user_id={user_id} khi viết các truy vấn liên quan đến dữ liệu người dùng hiện tại
-   - Khi người dùng hỏi về sách/tài liệu trong thư viện, hãy viết SQL để lấy toàn bộ dữ liệu (SELECT * FROM library_book), không cần lọc theo từ khóa tìm kiếm
+   - Khi người dùng hỏi về sách/tài liệu trong thư viện hoặc bài viết trong diễn đàn hoặc bài kiểm tra hoặc điểm số, hãy viết SQL để lấy toàn bộ dữ liệu ( ví dụ SELECT * FROM library_book), không cần lọc theo từ khóa tìm kiếm
 
 Câu hỏi của người dùng:
 {question}
@@ -90,6 +91,8 @@ Hướng dẫn làm bài kiểm tra : để làm bài kiểm tra bạn cần và
 Hướng dẫn mua sách : hệ thống được tích hợp thư viện online để bạn có thể tìm sách, lưu sách về và đọc trực tuyến trên hệ thống, sách có thể miễn phí hoặc trả phí, nếu trả phí, bạn bám vào nút mua, sau khi quét mã và nhập đúng nội dung chuyển khoản, sách sẽ tự động được lưu.
 Hướng dẫn tham gia thảo luận: hệ thống có tich hợp forum, nếu bạn cần hỏi gì hãy cứ lên đó trao đổi nhé.
 bạn dựa vào các thông tin đó để viết hướng dẫn nhé.
+
+Trong trường hợp người dùng hỏi câu hỏi dạng " có bài viết nào trong thư viện liên quan đến" bạn hãy xem xét và trả lời dựa trên dữ liệu và có thể tạo một chỗ nút gửi link bài viết đó cho người dùng, với các bài viết trong diễn đàn link chung sẽ là http://127.0.0.1:8000/forum/slug, slug lấy từ cơ sở dữ liệu ở bảng Forum ấy, hoặc sách trong thư viện sẽ là http://127.0.0.1:8000/library/book/book_id/.
 """
 
 # Configuration for Azure AI Inference

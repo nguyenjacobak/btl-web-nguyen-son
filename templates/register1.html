@@ -37,7 +37,7 @@
             <h5 class="text-danger">{{message}}</h5>
             {% endfor %}
           </div>
-        <form method="POST" action="" id="register-form">
+        <form method="POST" action="{% url 'register' %}" id="register-form">
             {% csrf_token %}
           <div class="mb-3">
             <label for="firstName" class="form-label">First Name</label>
