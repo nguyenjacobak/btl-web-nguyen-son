@@ -94,7 +94,8 @@ bạn dựa vào các thông tin đó để viết hướng dẫn nhé.
 
 # Configuration for Azure AI Inference
 ENDPOINT = "https://models.github.ai/inference"
-MODEL = "meta/Llama-4-Scout-17B-16E-Instruct"
+MODEL = os.environ.get("MODEL_ID", "")
+
 # GITHUB_TOKEN = ""
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 # Logger setup
