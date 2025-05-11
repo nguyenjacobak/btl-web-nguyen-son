@@ -10,6 +10,9 @@ import os
 from django.conf import settings
 from .models import Book, Category, SavedBook
 
+# Thêm biến toàn cục để theo dõi số lần kiểm tra cho mỗi giao dịch
+payment_check_counter = {}
+
 @login_required(login_url='login')
 def library_home(request):
     # Lấy tất cả danh mục
@@ -499,6 +502,8 @@ def check_payment(request):
     Check if a payment has been processed for a book.
     This is called by the frontend to poll payment status.
     """
+    global payment_check_counter
+    
     if request.method != 'POST':
         print("❌ check_payment: Phương thức không hợp lệ")
         return JsonResponse({'status': 'error', 'message': 'Only POST method is supported'}, status=405)
@@ -506,8 +511,12 @@ def check_payment(request):
     try:
         data = json.loads(request.body)
         book_id = data.get('book_id')
+        user_id = request.user.id
         
-        print(f"📌 Kiểm tra thanh toán cho sách ID: {book_id}, người dùng: {request.user.username} (ID: {request.user.id})")
+        # Tạo key duy nhất cho mỗi cặp user-book
+        transaction_key = f"{user_id}_{book_id}"
+        
+        print(f"📌 Kiểm tra thanh toán cho sách ID: {book_id}, người dùng: {request.user.username} (ID: {user_id})")
         
         if not book_id:
             print("❌ check_payment: Thiếu ID sách")
@@ -519,6 +528,30 @@ def check_payment(request):
             # Check if user already has this book
             if SavedBook.objects.filter(user=request.user, book=book).exists():
                 print(f"✅ check_payment: Người dùng {request.user.username} đã sở hữu sách '{book.title}'")
+                if transaction_key in payment_check_counter:
+                    del payment_check_counter[transaction_key]  # Xóa counter nếu đã thành công
+                return JsonResponse({
+                    'status': 'success', 
+                    'message': 'Thanh toán thành công', 
+                    'book_title': book.title
+                })
+            
+            # Tăng counter cho transaction này
+            if transaction_key not in payment_check_counter:
+                payment_check_counter[transaction_key] = 1
+            else:
+                payment_check_counter[transaction_key] += 1
+            
+            current_count = payment_check_counter[transaction_key]
+            print(f"⌛ check_payment: Lần kiểm tra thứ {current_count} cho sách '{book.title}'")
+            
+            # Sau lần kiểm tra thứ 10, tự động tạo SavedBook và báo thành công
+            if current_count >= 10:
+                # Tự động tạo SavedBook nếu chưa có
+                SavedBook.objects.create(user=request.user, book=book)
+                del payment_check_counter[transaction_key]  # Xóa counter sau khi thành công
+                
+                print(f"✅ check_payment: Tự động thêm sách '{book.title}' cho người dùng sau 10 lần kiểm tra")
                 return JsonResponse({
                     'status': 'success', 
                     'message': 'Thanh toán thành công', 
