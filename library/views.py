@@ -293,142 +293,154 @@ def add_book(request):
 
 @csrf_exempt
 def sepay_webhook(request):
-    if request.method == "POST":
+    """
+    Webhook handler for SePay payment notifications.
+    SePay will POST to this endpoint whenever a payment is received.
+    """
+    if request.method != "POST":
+        print("❌ Webhook SePay nhận được phương thức không phải POST")
+        return JsonResponse({"error": "Only POST method is supported"}, status=405)
+        
+    try:
+        # Parse the incoming JSON data
+        data = json.loads(request.body)
+        print(f"✅ Nhận Webhook từ SePay: {data}")
+        
+        # Extract payment details
+        transaction_id = data.get("id")  
+        content = data.get("content", "")  
+        transfer_amount = data.get("transferAmount", 0)  
+        transfer_type = data.get("transferType")  
+        gateway = data.get("gateway", "")  # Ngân hàng
+        transaction_date = data.get("transactionDate", "")  # Thời gian giao dịch
+        
+        print(f"📌 Chi tiết giao dịch: ID={transaction_id}, Ngân hàng={gateway}, Thời gian={transaction_date}")
+        print(f"📌 Nội dung: '{content}', Số tiền: {transfer_amount}, Loại: {transfer_type}")
+        
+        # Only process incoming transfers
+        if transfer_type != "in":
+            print(f"❌ Bỏ qua giao dịch {transaction_id} vì không phải tiền vào")
+            return JsonResponse({"status": "ignored", "message": "Not an incoming transfer"}, status=200)
+        
+        # Check if this is a book purchase by looking for the PTITBOOK prefix
+        if "PTITBOOK" not in content:
+            print(f"❌ Bỏ qua giao dịch {transaction_id} vì không phải mua sách (không có tiền tố PTITBOOK)")
+            return JsonResponse({"status": "ignored", "message": "Not a book purchase"}, status=200)
+            
+        # Extract book_id and user_id from the payment content
         try:
-            data = json.loads(request.body)
+            payment_info = content.replace("PTITBOOK", "")
             
-            # In ra console để debug
-            print(f"Nhận Webhook từ SePay: {data}")
+            # Format should be PTITBOOKxxxxyyyy where xxxx is book_id and yyyy is user_id
+            if len(payment_info) <= 5:
+                print(f"❌ Nội dung không đủ dài để trích xuất thông tin: {content}")
+                return JsonResponse({"status": "error", "message": "Invalid payment content format"}, status=200)
+                
+            book_id = int(payment_info[:5])  
+            user_id = int(payment_info[5:])
             
-            # Lấy thông tin giao dịch
-            transaction_id = data.get("id")  # ID giao dịch trên SePay
-            content = data.get("content", "")  # Nội dung chuyển khoản
-            transfer_amount = data.get("transferAmount")  # Số tiền giao dịch
-            transfer_type = data.get("transferType")  # Loại giao dịch (in/out)
-            transaction_date = data.get("transactionDate")  # Thời gian giao dịch
-            gateway = data.get("gateway")  # Ngân hàng
+            print(f"✅ Phát hiện thanh toán sách: book_id={book_id}, user_id={user_id}, số tiền={transfer_amount}")
             
-            # Kiểm tra nếu đây là tiền vào (chuyển khoản đến tài khoản)
-            if transfer_type != "in":
-                print(f"Bỏ qua giao dịch {transaction_id} vì không phải tiền vào")
-                return JsonResponse({"message": "Not an incoming transfer"}, status=200)
+            # Get the book and user objects
+            from django.contrib.auth.models import User
             
-            # Phân tích nội dung thanh toán để tìm book_id và user_id
-            # Định dạng mới: "PTITBOOK[book_id][user_id]" - không có ký tự đặc biệt
-            try:
-                if "PTITBOOK" in content:
-                    # Cắt bỏ phần "PTITBOOK" ở đầu
-                    payment_info = content.replace("PTITBOOK", "")
-                    
-                    # Phân tích chuỗi còn lại để lấy book_id và user_id
-                    # Giả sử book_id có tối đa 5 chữ số và user_id có phần còn lại
-                    if len(payment_info) > 5:
-                        book_id = int(payment_info[:5])  # Lấy tối đa 5 chữ số đầu tiên cho book_id
-                        user_id = int(payment_info[5:])  # Phần còn lại là user_id
-                        
-                        print(f"Phát hiện mua sách: book_id={book_id}, user_id={user_id}")
-                        
-                        # Xử lý mua sách
-                        from django.contrib.auth.models import User
-                        
-                        book = Book.objects.get(id=book_id)
-                        user = User.objects.get(id=user_id)
-                        
-                        # Kiểm tra số tiền thanh toán với giá sách
-                        if int(book.price) <= int(transfer_amount):
-                            # Tạo SavedBook nếu chưa tồn tại
-                            if not SavedBook.objects.filter(user=user, book=book).exists():
-                                saved_book = SavedBook.objects.create(user=user, book=book)
-                                print(f"Đã lưu sách ID: {book_id} cho người dùng ID: {user_id}")
-                                
-                                # Lưu thông tin giao dịch (nếu cần)
-                                # Có thể tạo model Transaction để lưu chi tiết giao dịch
-                                
-                                return JsonResponse({"message": "Book purchased successfully"}, status=200)
-                            else:
-                                print(f"Sách ID: {book_id} đã được lưu cho người dùng ID: {user_id} trước đó")
-                                return JsonResponse({"message": "Book already purchased"}, status=200)
-                        else:
-                            print(f"Số tiền không đủ: Sách giá {book.price}, thanh toán {transfer_amount}")
-                            return JsonResponse({"message": "Insufficient payment amount"}, status=200)
-                    else:
-                        print(f"Nội dung không đủ dài: {content}")
-                else:
-                    print(f"Không phải giao dịch mua sách: {content}")
-            except Book.DoesNotExist:
-                print(f"Không tìm thấy sách với ID: {book_id}")
-            except User.DoesNotExist:
-                print(f"Không tìm thấy người dùng với ID: {user_id}")
-            except (IndexError, ValueError) as e:
-                print(f"Lỗi khi phân tích nội dung: {str(e)}")
-            except Exception as e:
-                print(f"Lỗi khi xử lý lưu sách: {str(e)}")
+            book = Book.objects.get(id=book_id)
+            user = User.objects.get(id=user_id)
             
-            # Trả về phản hồi thành công ngay cả khi không xử lý được giao dịch
-            # để tránh SePay gửi lại webhook nhiều lần
-            return JsonResponse({"message": "Webhook received but not processed"}, status=200)
-
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON"}, status=400)
+            print(f"✅ Tìm thấy sách: '{book.title}' (ID: {book_id}) và người dùng: {user.username} (ID: {user_id})")
+            
+            # Verify payment amount matches book price
+            if int(transfer_amount) < int(book.price):
+                print(f"❌ Thanh toán không đủ: Sách giá {book.price}, thanh toán {transfer_amount}")
+                return JsonResponse({
+                    "status": "error", 
+                    "message": f"Insufficient payment. Required: {book.price}, Received: {transfer_amount}"
+                }, status=200)
+                
+            # Add book to user's saved books
+            if not SavedBook.objects.filter(user=user, book=book).exists():
+                SavedBook.objects.create(user=user, book=book)
+                print(f"✅ ĐÃ XỬ LÝ THÀNH CÔNG! Đã thêm sách '{book.title}' (ID: {book_id}) cho người dùng {user.username} (ID: {user_id})")
+            else:
+                print(f"⚠️ Người dùng {user.username} (ID: {user_id}) đã sở hữu sách '{book.title}' (ID: {book_id}) từ trước")
+                
+            # Return success response
+            return JsonResponse({
+                "status": "success", 
+                "message": "Payment processed successfully",
+                "transaction_id": transaction_id,
+                "book_id": book_id,
+                "book_title": book.title,
+                "user_id": user_id,
+                "username": user.username
+            }, status=200)
+            
+        except Book.DoesNotExist:
+            print(f"❌ Không tìm thấy sách với ID: {book_id}")
+            return JsonResponse({"status": "error", "message": f"Book ID {book_id} not found"}, status=200)
+        except User.DoesNotExist:
+            print(f"❌ Không tìm thấy người dùng với ID: {user_id}")
+            return JsonResponse({"status": "error", "message": f"User ID {user_id} not found"}, status=200)
+        except ValueError as e:
+            print(f"❌ Lỗi định dạng: {str(e)}")
+            return JsonResponse({"status": "error", "message": f"Format error: {str(e)}"}, status=200)
         except Exception as e:
-            print(f"Lỗi không xác định: {str(e)}")
-            return JsonResponse({"error": str(e)}, status=500)
-
-    return JsonResponse({"error": "Invalid request method"}, status=400)
+            print(f"❌ Lỗi xử lý thanh toán: {str(e)}")
+            return JsonResponse({"status": "error", "message": f"Processing error: {str(e)}"}, status=200)
+            
+    except json.JSONDecodeError:
+        print("❌ Lỗi giải mã JSON từ dữ liệu webhook")
+        return JsonResponse({"status": "error", "message": "Invalid JSON format"}, status=400)
+    except Exception as e:
+        print(f"❌ Lỗi không xác định: {str(e)}")
+        return JsonResponse({"status": "error", "message": f"Unexpected error: {str(e)}"}, status=500)
 
 @login_required
 def check_payment(request):
-    if request.method == 'POST':
+    """
+    Check if a payment has been processed for a book.
+    This is called by the frontend to poll payment status.
+    """
+    if request.method != 'POST':
+        print("❌ check_payment: Phương thức không hợp lệ")
+        return JsonResponse({'status': 'error', 'message': 'Only POST method is supported'}, status=405)
+        
+    try:
+        data = json.loads(request.body)
+        book_id = data.get('book_id')
+        
+        print(f"📌 Kiểm tra thanh toán cho sách ID: {book_id}, người dùng: {request.user.username} (ID: {request.user.id})")
+        
+        if not book_id:
+            print("❌ check_payment: Thiếu ID sách")
+            return JsonResponse({'status': 'error', 'message': 'Missing book_id parameter'}, status=400)
+        
         try:
-            data = json.loads(request.body)
-            book_id = data.get('book_id')
-            amount = data.get('amount')
-            
-            if not book_id:
-                return JsonResponse({'status': 'error', 'message': 'Thiếu ID sách'})
-            
             book = Book.objects.get(id=book_id)
             
-            # Kiểm tra xem người dùng đã có sách này trong thư viện chưa
+            # Check if user already has this book
             if SavedBook.objects.filter(user=request.user, book=book).exists():
-                return JsonResponse({'status': 'success', 'message': 'Sách đã được mua trước đó'})
+                print(f"✅ check_payment: Người dùng {request.user.username} đã sở hữu sách '{book.title}'")
+                return JsonResponse({
+                    'status': 'success', 
+                    'message': 'Thanh toán thành công', 
+                    'book_title': book.title
+                })
             
-            # Trong môi trường thật, bạn sẽ kiểm tra giao dịch từ SePay ở đây
-            # Ví dụ: gọi API của SePay để kiểm tra giao dịch gần đây
-            
-            # Tìm kiếm giao dịch trong database
-            found_payment = False
-            
-            # TODO: Thêm logic kiểm tra thanh toán thực tế
-            
-            # Giả lập kiểm tra thanh toán cho môi trường test
-            # Trong môi trường thật, hãy bỏ đoạn giả lập này và sử dụng API SePay
-            import random
-            import time
-            
-            # Thêm độ trễ để mô phỏng việc kiểm tra
-            time.sleep(2)
-            
-            # Mô phỏng xác suất thanh toán thành công 20% để test
-            if random.random() < 0.2:  # 20% xác suất thành công
-                found_payment = True
-            
-            if found_payment:
-                # Lưu sách cho người dùng khi xác nhận thanh toán thành công
-                if not SavedBook.objects.filter(user=request.user, book=book).exists():
-                    SavedBook.objects.create(user=request.user, book=book)
+            # Payment not yet processed
+            print(f"⌛ check_payment: Chưa tìm thấy thanh toán cho sách '{book.title}' của người dùng {request.user.username}")
+            return JsonResponse({'status': 'pending', 'message': 'Đang chờ thanh toán'})
                 
-                return JsonResponse({'status': 'success', 'message': 'Thanh toán thành công'})
-            else:
-                return JsonResponse({'status': 'error', 'message': 'Chưa tìm thấy giao dịch thanh toán'})
         except Book.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Không tìm thấy sách'})
-        except json.JSONDecodeError:
-            return JsonResponse({'status': 'error', 'message': 'Dữ liệu không hợp lệ'})
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)})
-
-    return JsonResponse({'status': 'error', 'message': 'Phương thức không hợp lệ'})
+            print(f"❌ check_payment: Không tìm thấy sách ID {book_id}")
+            return JsonResponse({'status': 'error', 'message': 'Không tìm thấy sách'}, status=404)
+                
+    except json.JSONDecodeError:
+        print("❌ check_payment: Lỗi giải mã JSON")
+        return JsonResponse({'status': 'error', 'message': 'Dữ liệu không hợp lệ'}, status=400)
+    except Exception as e:
+        print(f"❌ check_payment: Lỗi không xác định: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 @login_required
 def delete_book(request, book_id):

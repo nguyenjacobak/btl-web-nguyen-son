@@ -11,6 +11,6 @@ urlpatterns = [
     path('saved-books/', views.saved_books, name='saved_books'),
     path('remove-saved-book/<int:book_id>/', views.remove_saved_book, name='remove_saved_book'),
     path('add-book/', views.add_book, name='add_book'),
-    path('webhook/sepay/', views.sepay_webhook, name='sepay_webhook'),
+    path('hooks/sepay-payment/', views.sepay_webhook, name='sepay_webhook'),
     path('delete-book/<int:book_id>/', views.delete_book, name='delete_book'),
 ]

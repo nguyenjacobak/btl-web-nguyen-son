@@ -279,19 +279,16 @@
                     <!-- Thêm thông tin nội dung chuyển khoản (sẽ được điền bằng JavaScript) -->
                     <div class="payment-content mt-2"></div>
                     
-                    <!-- Thêm phần hiển thị trạng thái kiểm tra thanh toán -->
-                    <div class="payment-status mt-3" style="display: none;">
+                    <!-- Phần hiển thị trạng thái kiểm tra thanh toán -->
+                    <div class="payment-status mt-3">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Đang kiểm tra...</span>
                         </div>
-                        <p class="mt-2 checking-text">Đang kiểm tra thanh toán...</p>
+                        <p class="mt-2 checking-text">Đang chờ thanh toán...</p>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="glass-btn" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="glass-btn-success complete-payment-btn">
-                        <i class="fas fa-check-circle"></i> Tôi đã chuyển khoản
-                    </button>
                 </div>
             </div>
         </div>
@@ -329,6 +326,7 @@
             const buyButtons = document.querySelectorAll('.buy-book-btn');
             const paymentModal = new bootstrap.Modal(document.getElementById('paymentQRModal'));
             const userId = "{{ request.user.id }}"; // Lấy ID người dùng hiện tại
+            let pollingInterval; // Biến lưu ID của interval để có thể clear khi cần
             
             buyButtons.forEach(button => {
                 button.addEventListener('click', function() {
@@ -341,7 +339,6 @@
                     const bookTitle = card.querySelector('.card-title').textContent;
                     
                     // Tạo nội dung thanh toán theo định dạng để webhook xử lý
-                    // Sử dụng định dạng không có ký tự đặc biệt
                     const paymentContent = `PTITBOOK${bookId}${userId}`;
                     
                     // Cập nhật nội dung modal
@@ -349,95 +346,140 @@
                     document.querySelector('.price-display').textContent = `Giá: ${bookPrice} VNĐ`;
                     
                     // Thêm thông tin nội dung chuyển khoản vào modal
-                    const contentElement = document.querySelector('.payment-content') || document.createElement('p');
-                    contentElement.className = 'payment-content mt-2';
-                    contentElement.innerHTML = `<strong>Nội dung chuyển khoản:</strong><br><code>${paymentContent}</code>`;
+                    const contentElement = document.querySelector('.payment-content');
+                    contentElement.innerHTML = `
+                        <div class="alert alert-info">
+                            <strong>Nội dung chuyển khoản:</strong><br>
+                            <code class="fs-5">${paymentContent}</code><br>
+                            <small>Vui lòng nhập chính xác nội dung này khi chuyển khoản</small>
+                        </div>
+                        <div class="mt-2">
+                            <small class="text-muted">Chi tiết thanh toán:</small><br>
+                            <small>- Sách: ${bookTitle}</small><br>
+                            <small>- ID sách: ${bookId}</small><br>
+                            <small>- ID người dùng: ${userId}</small><br>
+                            <small>- Số tiền: ${bookPrice} VNĐ</small>
+                        </div>
+                    `;
                     
-                    // Thêm vào modal nếu chưa có
-                    if (!document.querySelector('.payment-content')) {
-                        document.querySelector('.modal-body').appendChild(contentElement);
-                    }
+                    // Hiển thị phần trạng thái kiểm tra và thiết lập trạng thái ban đầu
+                    const paymentStatus = document.querySelector('.payment-status');
+                    paymentStatus.style.display = 'block';
+                    paymentStatus.querySelector('.spinner-border').style.display = 'inline-block';
+                    paymentStatus.querySelector('.checking-text').textContent = 'Đang chờ xác nhận thanh toán...';
                     
-                    // Lưu thông tin vào nút hoàn thành thanh toán
-                    const completeButton = document.querySelector('.complete-payment-btn');
-                    completeButton.setAttribute('data-book-id', bookId);
-                    completeButton.setAttribute('data-user-id', userId);
-                    completeButton.setAttribute('data-amount', bookPrice);
-                    completeButton.setAttribute('data-content', paymentContent);
+                    console.log(`Bắt đầu theo dõi thanh toán cho sách: "${bookTitle}" (ID: ${bookId})`);
                     
                     // Hiển thị modal
                     paymentModal.show();
                     
-                    // Ẩn phần trạng thái kiểm tra
-                    document.querySelector('.payment-status').style.display = 'none';
+                    // Clear interval cũ nếu có
+                    if (pollingInterval) {
+                        clearInterval(pollingInterval);
+                    }
+                    
+                    // Bắt đầu polling để kiểm tra trạng thái thanh toán
+                    startPaymentPolling(bookId, userId, bookTitle);
                 });
             });
             
-            // Xử lý khi người dùng nhấn nút "Tôi đã chuyển khoản"
-            document.querySelector('.complete-payment-btn').addEventListener('click', function() {
-                const bookId = this.getAttribute('data-book-id');
-                const userId = this.getAttribute('data-user-id');
-                const amount = this.getAttribute('data-amount');
-                const content = this.getAttribute('data-content');
+            // Hàm bắt đầu polling kiểm tra thanh toán
+            function startPaymentPolling(bookId, userId, bookTitle) {
                 const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+                let attempts = 0;
+                const maxAttempts = 60; // Số lần kiểm tra tối đa (5 phút với interval 5s)
                 
-                // Hiển thị trạng thái đang kiểm tra
-                const paymentStatus = document.querySelector('.payment-status');
-                paymentStatus.style.display = 'block';
+                const statusElement = document.querySelector('.payment-status .checking-text');
+                statusElement.innerHTML = `<span class="text-info">Đang chờ thanh toán cho sách "${bookTitle}"...</span>`;
                 
-                // Ẩn nút "Tôi đã chuyển khoản" 
-                this.disabled = true;
+                console.log(`Bắt đầu kiểm tra thanh toán mỗi 5 giây cho sách ID: ${bookId}`);
                 
-                // Gửi request để kiểm tra thanh toán
-                fetch('/library/check-payment/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken,
-                    },
-                    body: JSON.stringify({ 
-                        book_id: bookId,
-                        user_id: userId,
-                        amount: amount,
-                        content: content
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Ẩn spinner
-                    paymentStatus.querySelector('.spinner-border').style.display = 'none';
+                pollingInterval = setInterval(() => {
+                    attempts++;
                     
-                    if (data.status === 'success') {
-                        // Hiển thị trạng thái thành công
-                        paymentStatus.querySelector('.checking-text').innerHTML = '<span class="text-success"><i class="fas fa-check-circle"></i> Thanh toán thành công!</span>';
-                        
-                        // Đợi 2 giây rồi đóng modal và làm mới trang
-                        setTimeout(function() {
-                            // Đóng modal
-                            const modal = bootstrap.Modal.getInstance(document.getElementById('paymentQRModal'));
-                            modal.hide();
-                            
-                            // Làm mới trang
-                            window.location.reload();
-                        }, 2000);
-                    } else {
-                        // Hiển thị trạng thái lỗi
-                        paymentStatus.querySelector('.checking-text').innerHTML = 
-                            `<span class="text-danger"><i class="fas fa-exclamation-circle"></i> ${data.message}</span>
-                            <p class="small mt-1">Nếu bạn đã chuyển khoản, vui lòng đợi trong giây lát và thử lại.</p>`;
-                        
-                        // Kích hoạt lại nút để người dùng có thể thử lại
-                        document.querySelector('.complete-payment-btn').disabled = false;
+                    // Cập nhật trạng thái kiểm tra
+                    if (attempts % 10 === 0) {
+                        statusElement.innerHTML = `<span class="text-info">Đã kiểm tra ${attempts} lần. Tiếp tục chờ thanh toán...</span>`;
+                        console.log(`Đã kiểm tra ${attempts}/${maxAttempts} lần cho sách ID: ${bookId}`);
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    paymentStatus.querySelector('.spinner-border').style.display = 'none';
-                    paymentStatus.querySelector('.checking-text').innerHTML = 
-                        '<span class="text-danger"><i class="fas fa-exclamation-circle"></i> Đã xảy ra lỗi khi kiểm tra thanh toán. Vui lòng thử lại sau.</span>';
-                    document.querySelector('.complete-payment-btn').disabled = false;
+                    
+                    // Gửi request để kiểm tra thanh toán
+                    fetch('/library/check-payment/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken,
+                        },
+                        body: JSON.stringify({ 
+                            book_id: bookId,
+                            user_id: userId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Thanh toán thành công
+                            clearInterval(pollingInterval);
+                            console.log(`✅ THANH TOÁN THÀNH CÔNG cho sách "${data.book_title || bookTitle}"!`);
+                            
+                            // Cập nhật UI
+                            const paymentStatus = document.querySelector('.payment-status');
+                            paymentStatus.querySelector('.spinner-border').style.display = 'none';
+                            paymentStatus.querySelector('.checking-text').innerHTML = `
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle"></i> Thanh toán thành công!<br>
+                                    <small>Sách "${data.book_title || bookTitle}" đã được thêm vào thư viện của bạn.</small>
+                                </div>
+                            `;
+                            
+                            // Đợi 2 giây rồi đóng modal và làm mới trang
+                            setTimeout(() => {
+                                const modal = bootstrap.Modal.getInstance(document.getElementById('paymentQRModal'));
+                                modal.hide();
+                                window.location.reload();
+                            }, 2000);
+                        } else if (data.status === 'error') {
+                            // Có lỗi xảy ra
+                            clearInterval(pollingInterval);
+                            console.error(`❌ Lỗi kiểm tra thanh toán: ${data.message}`);
+                            
+                            const paymentStatus = document.querySelector('.payment-status');
+                            paymentStatus.querySelector('.checking-text').innerHTML = `
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-exclamation-circle"></i> Lỗi: ${data.message}<br>
+                                    <small>Vui lòng thử lại sau hoặc liên hệ hỗ trợ.</small>
+                                </div>
+                            `;
+                        }
+                        
+                        // Nếu quá số lần kiểm tra tối đa
+                        if (attempts >= maxAttempts) {
+                            clearInterval(pollingInterval);
+                            console.warn(`⚠️ Hết thời gian chờ thanh toán cho sách ID: ${bookId}`);
+                            
+                            const paymentStatus = document.querySelector('.payment-status');
+                            paymentStatus.querySelector('.checking-text').innerHTML = `
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle"></i> Hết thời gian chờ thanh toán.<br>
+                                    <small>Nếu bạn đã thanh toán, vui lòng làm mới trang sau vài phút.</small>
+                                </div>
+                            `;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Lỗi khi kiểm tra thanh toán:', error);
+                    });
+                }, 5000); // Kiểm tra mỗi 5 giây
+                
+                // Dừng polling khi modal đóng
+                const paymentModalElement = document.getElementById('paymentQRModal');
+                paymentModalElement.addEventListener('hidden.bs.modal', function () {
+                    if (pollingInterval) {
+                        clearInterval(pollingInterval);
+                        console.log(`Đã dừng kiểm tra thanh toán cho sách ID: ${bookId}`);
+                    }
                 });
-            });
+            }
         });
 
         // Set up the delete modal
