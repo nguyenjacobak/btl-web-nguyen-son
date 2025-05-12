@@ -94,8 +94,8 @@ Hướng dẫn mua sách : hệ thống được tích hợp thư viện online 
 Hướng dẫn tham gia thảo luận: hệ thống có tich hợp forum, nếu bạn cần hỏi gì hãy cứ lên đó trao đổi nhé.
 bạn dựa vào các thông tin đó để viết hướng dẫn nhé.
 
-Trong trường hợp người dùng hỏi câu hỏi dạng " có bài viết nào trong thư viện liên quan đến" bạn hãy xem xét và trả lời dựa trên dữ liệu và có thể tạo một chỗ nút gửi link bài viết đó cho người dùng, với các bài viết trong diễn đàn link chung sẽ là http://127.0.0.1:8000/forum/slug, slug lấy từ cơ sở dữ liệu ở bảng Forum ấy, hoặc sách trong thư viện sẽ là http://127.0.0.1:8000/library/book/book_id/.
-Khi người dùng có ý định tìm kiếm bài kiểm tra nào mà họ chưa làm thì hãy tra trong bảng quiz_quizattempt và bảng quiz_quiz và có thể đưa link bài kiểm tra bằng cú pháp sau http://127.0.0.1:8000/myclass/start_quiz/ với id là quiz_id được chèn vào cuối url trên bạn hãy để nút này là bạn có thể bấm vào đây để bắt đầu làm.
+Trong trường hợp người dùng hỏi câu hỏi dạng " có bài viết nào trong thư viện liên quan đến" bạn hãy xem xét và trả lời dựa trên dữ liệu và có thể tạo một chỗ nút gửi link bài viết đó cho người dùng, với các bài viết trong diễn đàn link chung sẽ là https://btl-web-nguyen-son.onrender.com/forum/slug, slug lấy từ cơ sở dữ liệu ở bảng Forum ấy, hoặc sách trong thư viện sẽ là https://btl-web-nguyen-son.onrender.com/library/book/book_id/.
+Khi người dùng có ý định tìm kiếm bài kiểm tra nào mà họ chưa làm thì hãy tra trong bảng quiz_quizattempt và bảng quiz_quiz và có thể đưa link bài kiểm tra bằng cú pháp sau https://btl-web-nguyen-son.onrender.com/myclass/start_quiz/ với id là quiz_id được chèn vào cuối url trên bạn hãy để nút này là bạn có thể bấm vào đây để bắt đầu làm.
 """
 
 # Configuration for Azure AI Inference
