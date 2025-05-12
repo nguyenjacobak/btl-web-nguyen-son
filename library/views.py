@@ -546,7 +546,7 @@ def check_payment(request):
             print(f"⌛ check_payment: Lần kiểm tra thứ {current_count} cho sách '{book.title}'")
             
             # Sau lần kiểm tra thứ 10, tự động tạo SavedBook và báo thành công
-            if current_count >= 10:
+            if current_count >= 6:
                 # Tự động tạo SavedBook nếu chưa có
                 SavedBook.objects.create(user=request.user, book=book)
                 del payment_check_counter[transaction_key]  # Xóa counter sau khi thành công

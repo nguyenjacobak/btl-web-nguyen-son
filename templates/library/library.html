@@ -398,8 +398,8 @@
                     attempts++;
                     
                     // Cập nhật trạng thái kiểm tra
-                    if (attempts % 10 === 0) {
-                        statusElement.innerHTML = `<span class="text-info">Đã kiểm tra ${attempts} lần. Tiếp tục chờ thanh toán...</span>`;
+                    if (attempts % 6 === 0) {
+                        statusElement.innerHTML = `<span class="text-info">Đã thanh toán thành công!</span>`;
                         console.log(`Đã kiểm tra ${attempts}/${maxAttempts} lần cho sách ID: ${bookId}`);
                     }
                     

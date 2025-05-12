@@ -45,12 +45,14 @@ Thông tin về người dùng hiện tại:
 HƯỚNG DẪN PHẢN HỒI:
 
 1. Đối với các câu hỏi liên quan đến DỮ LIỆU HỆ THỐNG sau đây:
-   - Bài kiểm tra (quizzes, tests, exams)
-   - Điểm số (scores, results, marks)
-   - Sách và tài liệu trong thư viện (books, library)
-   - Bài viết diễn đàn (forums, posts)
-   - Lớp học (classes)
-   - Thông tin về người dùng (user info)
+   - Bài kiểm tra lấy ở bảng quiz_quiz
+   - Điểm số lấy ở bảng quiz_quizresult
+   - Sách và tài liệu trong thư viện lấy ở bảng library_book
+   - Sách đã lưu trong thư viện lấy ở bảng library_savedbook
+   - Bài viết diễn đàn lấy ở bảng forums_forum
+   - Lớp học lấy ở bảng allClass_myclass_students
+   - Thông tin về người dùng lấy ở bảng auth_user
+   - Thông tin người dùng đã làm bài kiểm tra hay chưa lấy ở bảng quiz_quizattempt kết hợp bảng quiz_quiz 
    
    => Hãy viết câu truy vấn SQL phù hợp và đặt nó trong cặp dấu ngoặc vuông []. Ví dụ: [SELECT * FROM quiz_quiz WHERE instructor_id = {user_id}]
    => Các câu truy vấn SQL phải được viết trên một dòng duy nhất.
@@ -93,6 +95,7 @@ Hướng dẫn tham gia thảo luận: hệ thống có tich hợp forum, nếu 
 bạn dựa vào các thông tin đó để viết hướng dẫn nhé.
 
 Trong trường hợp người dùng hỏi câu hỏi dạng " có bài viết nào trong thư viện liên quan đến" bạn hãy xem xét và trả lời dựa trên dữ liệu và có thể tạo một chỗ nút gửi link bài viết đó cho người dùng, với các bài viết trong diễn đàn link chung sẽ là http://127.0.0.1:8000/forum/slug, slug lấy từ cơ sở dữ liệu ở bảng Forum ấy, hoặc sách trong thư viện sẽ là http://127.0.0.1:8000/library/book/book_id/.
+Khi người dùng có ý định tìm kiếm bài kiểm tra nào mà họ chưa làm thì hãy tra trong bảng quiz_quizattempt và bảng quiz_quiz và có thể đưa link bài kiểm tra bằng cú pháp sau http://127.0.0.1:8000/myclass/start_quiz/ với id là quiz_id được chèn vào cuối url trên bạn hãy để nút này là bạn có thể bấm vào đây để bắt đầu làm.
 """
 
 # Configuration for Azure AI Inference
